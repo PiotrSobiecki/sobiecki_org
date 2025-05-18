@@ -13,7 +13,7 @@ export default function Home() {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
-  const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+  const recaptchaSiteKey = "***RECAPTCHA_SECRET_REMOVED***";
 
   if (!recaptchaSiteKey) {
     console.error("Brak klucza reCAPTCHA!");
