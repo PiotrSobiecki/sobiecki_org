@@ -32,7 +32,7 @@ export default function Home() {
     const message = (form.elements.namedItem("message") as HTMLTextAreaElement)
       .value;
     const recaptcha = recaptchaRef.current;
-    const token = await recaptcha?.executeAsync();
+    const token = recaptcha?.getValue();
 
     if (!token) {
       setError("Potwierdź, że nie jesteś robotem.");
