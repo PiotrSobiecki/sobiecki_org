@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Piotr Sobiecki - Profesjonalne Usługi Informatyczne",
   description:
-    "Profesjonalne usługi informatyczne - wsparcie IT, naprawa komputerów, konfiguracja sieci i wiele więcej.",
+    "Profesjonalne usługi informatyczne - tworzenie aplikacji webowych, analiza danych blockchain, budowa botów i doradztwo IT",
 };
 
 export default function RootLayout({
@@ -26,11 +26,11 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.png" />
         <meta
           name="description"
-          content="Profesjonalne usługi informatyczne - wsparcie IT, naprawa komputerów, konfiguracja sieci i wiele więcej."
+          content="Profesjonalne usługi informatyczne - tworzenie aplikacji webowych, analiza danych blockchain, budowa botów i doradztwo IT."
         />
         <meta
           name="keywords"
-          content="usługi informatyczne, wsparcie IT, naprawa komputerów, konfiguracja sieci"
+          content="usługi informatyczne, aplikacje webowe, blockchain, boty, doradztwo IT"
         />
         <meta name="author" content="Piotr Sobiecki" />
         <meta
@@ -39,7 +39,7 @@ export default function RootLayout({
         />
         <meta
           property="og:description"
-          content="Profesjonalne usługi informatyczne - wsparcie IT, naprawa komputerów, konfiguracja sieci i wiele więcej."
+          content="Profesjonalne usługi informatyczne - tworzenie aplikacji webowych, analiza danych blockchain, budowa botów i doradztwo IT."
         />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://sobiecki.org" />
