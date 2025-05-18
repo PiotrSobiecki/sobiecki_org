@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Piotr Sobiecki - Profesjonalne Usługi Informatyczne",
   description:
-    "Profesjonalne usługi informatyczne - tworzenie aplikacji webowych, analiza danych blockchain, budowa botów i doradztwo IT",
+    " - tworzenie aplikacji webowych, analiza danych blockchain, budowa botów i doradztwo IT",
 };
 
 export default function RootLayout({

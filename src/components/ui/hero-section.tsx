@@ -29,7 +29,7 @@ export function HeroSection() {
             <div className="flex flex-col sm:flex-row gap-4 w-full">
               <Link href="#uslugi" className="w-full sm:w-auto">
                 <Button size="lg" variant="outline" className="gap-2 w-full">
-                  Nasze usługi
+                  Moje usługi
                   <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
