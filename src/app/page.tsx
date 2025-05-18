@@ -33,7 +33,6 @@ export default function Home() {
       .value;
     const recaptcha = recaptchaRef.current;
     const token = await recaptcha?.executeAsync();
-    recaptcha?.reset();
 
     if (!token) {
       setError("Potwierdź, że nie jesteś robotem.");
@@ -41,18 +40,30 @@ export default function Home() {
       return;
     }
 
-    const res = await fetch("/api/contact", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, message, token }),
-    });
-    const data = await res.json();
-    setLoading(false);
-    if (data.success) {
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, message, token }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(
+          data.error || "Wystąpił błąd podczas wysyłania wiadomości."
+        );
+      }
+
       setSuccess("Wiadomość została wysłana!");
       form.reset();
-    } else {
-      setError(data.error || "Coś poszło nie tak. Spróbuj ponownie.");
+      recaptcha?.reset();
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Wystąpił nieoczekiwany błąd."
+      );
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -309,11 +320,21 @@ export default function Home() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
                 ></textarea>
               </div>
-              <ReCAPTCHA
-                ref={recaptchaRef}
-                sitekey={recaptchaSiteKey}
-                size="invisible"
-              />
+              <div className="flex justify-center">
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={recaptchaSiteKey}
+                  size="normal"
+                  theme="light"
+                  onChange={(token) => {
+                    if (!token) {
+                      setError("Potwierdź, że nie jesteś robotem.");
+                    } else {
+                      setError("");
+                    }
+                  }}
+                />
+              </div>
               {success && (
                 <div className="text-green-600 text-sm">{success}</div>
               )}
