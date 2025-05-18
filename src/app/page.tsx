@@ -93,11 +93,9 @@ export default function Home() {
       <section id="uslugi" className="py-20 bg-gray-50">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Nasze Usługi
-            </h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Moje Usługi</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Oferujemy kompleksowe rozwiązania IT dostosowane do Twoich potrzeb
+              Oferuję kompleksowe rozwiązania IT dostosowane do Twoich potrzeb
             </p>
           </div>
 
@@ -149,7 +147,7 @@ export default function Home() {
               Przykładowe Projekty
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Zobacz przykłady naszych realizacji
+              Zobacz przykłady moich realizacji
             </p>
           </div>
 
@@ -269,7 +267,7 @@ export default function Home() {
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Kontakt</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Skontaktuj się z nami, aby omówić Twoje potrzeby
+              Skontaktuj się ze mną, aby omówić Twoje potrzeby
             </p>
           </div>
 
