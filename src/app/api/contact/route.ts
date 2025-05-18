@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
 
   // Walidacja reCAPTCHA
   const recaptchaRes = await fetch(
-    `https://www.google.com/recaptcha/api/siteverify?secret=6Lc2IT8rAAAAANLZruh6aCBQCvm0xuIg67Ek-hQK&response=${token}`,
+    `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${token}`,
     { method: "POST" }
   );
   const recaptchaData = await recaptchaRes.json();
