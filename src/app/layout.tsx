@@ -9,6 +9,10 @@ export const metadata: Metadata = {
   title: "Piotr Sobiecki - Profesjonalne Usługi Informatyczne",
   description:
     " - tworzenie aplikacji webowych, analiza danych blockchain, budowa botów i doradztwo IT",
+  icons: {
+    icon: "/favicon.png",
+    apple: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
