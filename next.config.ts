@@ -1,7 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "standalone",
   reactStrictMode: true,
+  output: "standalone",
+  webpack: (config: any) => {
+    return config;
+  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
