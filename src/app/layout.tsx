@@ -9,6 +9,11 @@ export const metadata: Metadata = {
   title: "Piotr Sobiecki - Profesjonalne Usługi Informatyczne",
   description:
     " - tworzenie aplikacji webowych, analiza danych blockchain, budowa botów i doradztwo IT",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
@@ -23,6 +28,9 @@ export default function RootLayout({
         <meta name="theme-color" content="#8B5CF6" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <link rel="icon" href="/favicon.ico" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" href="/favicon.ico" />
         <meta
           name="description"
           content="Profesjonalne usługi informatyczne - tworzenie aplikacji webowych, analiza danych blockchain, budowa botów i doradztwo IT."
