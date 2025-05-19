@@ -1,11 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "standalone",
   reactStrictMode: true,
-  images: {
-    unoptimized: true,
+  output: "standalone",
+  webpack: (config: any) => {
+    return config;
   },
-  assetPrefix: process.env.NODE_ENV === "production" ? "." : "",
 };
 
-export default nextConfig;
+module.exports = nextConfig;

@@ -1,24 +1,45 @@
 # Użyj obrazu Node.js 20 jako bazowego
 FROM node:20-alpine AS base
 
+# Etap instalacji zależności
+FROM base AS deps
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
 RUN npm ci
 
-COPY public ./public
-COPY next.config.ts ./
-COPY src ./src
-COPY tsconfig.json ./
-COPY postcss.config.js ./
-COPY tailwind.config.ts ./
+# Etap budowania
+FROM base AS builder
+WORKDIR /app
 
-RUN npm install
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
 
+ENV NEXT_TELEMETRY_DISABLED 1
 RUN npm run build
 
-EXPOSE 3000
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
+# Etap produkcyjny
+FROM base AS runner
+WORKDIR /app
 
-CMD ["npm", "start"] 
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+# Kopiuj pliki z etapu budowania
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+
+# Ustaw odpowiednie uprawnienia
+RUN chown -R nextjs:nodejs /app
+
+USER nextjs
+
+EXPOSE 3000
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+CMD ["node", "server.js"] 
