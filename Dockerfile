@@ -6,6 +6,7 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci
 
+COPY public ./public
 COPY . .
 
 RUN npm install

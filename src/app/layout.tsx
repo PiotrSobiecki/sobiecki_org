@@ -10,8 +10,8 @@ export const metadata: Metadata = {
   description:
     " - tworzenie aplikacji webowych, analiza danych blockchain, budowa botów i doradztwo IT",
   icons: {
-    icon: "/favicon.png",
-    apple: "/favicon.png",
+    icon: [{ url: "/favicon.png", type: "image/png" }],
+    apple: [{ url: "/favicon.png", type: "image/png" }],
   },
 };
 
