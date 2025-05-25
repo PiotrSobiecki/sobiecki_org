@@ -24,14 +24,14 @@ export function Navbar() {
           {/* Nawigacja desktopowa */}
           <nav className="hidden md:flex items-center space-x-8">
             <Link
-              href="#uslugi"
+              href="/#uslugi"
               className="text-gray-700 hover:text-primary transition-colors flex items-center gap-1"
             >
               <Code className="h-4 w-4" />
               Usługi
             </Link>
             <Link
-              href="#projekty"
+              href="/#projekty"
               className="text-gray-700 hover:text-primary transition-colors flex items-center gap-1"
             >
               <Layout className="h-4 w-4" />
@@ -67,13 +67,13 @@ export function Navbar() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuItem asChild>
-                <Link href="#uslugi" className="flex items-center gap-2">
+                <Link href="/#uslugi" className="flex items-center gap-2">
                   <Code className="h-4 w-4" />
                   Usługi
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="#projekty" className="flex items-center gap-2">
+                <Link href="/#projekty" className="flex items-center gap-2">
                   <Layout className="h-4 w-4" />
                   Przykładowe Projekty
                 </Link>
