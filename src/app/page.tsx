@@ -3,7 +3,7 @@ import { Navbar } from "@/components/ui/navbar";
 import { HeroSection } from "@/components/ui/hero-section";
 import { Footer } from "@/components/ui/footer";
 import Link from "next/link";
-import { Code, Database, Bot, Download } from "lucide-react";
+import { Code, Database, Bot, Download, Shield } from "lucide-react";
 import { useRef, useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 
@@ -151,7 +151,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* OddajHajs */}
             <div className="bg-gray-50 p-6 rounded-xl shadow-sm border border-gray-100">
               <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
@@ -166,6 +166,41 @@ export default function Home() {
               </p>
               <Link
                 href="https://oddajhajs.org"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:text-primary/80 transition-colors inline-flex items-center gap-1"
+              >
+                Odwiedź stronę
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                  />
+                </svg>
+              </Link>
+            </div>
+
+            {/* Signum Wallet */}
+            <div className="bg-gray-50 p-6 rounded-xl shadow-sm border border-gray-100">
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                <Database className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Signum Wallet</h3>
+              <p className="text-gray-600 mb-4">
+                Portfel webowy obsługujący Arbitrum, Ethereum, Polygon i Base.
+                Umożliwia zakładanie portfeli, przesyłanie tokenów i NFT oraz
+                przeglądanie historii transakcji. Narzędzie ma pełną
+                funkcjonalność, lecz służy głównie celom demonstracyjnym.
+              </p>
+              <Link
+                href="https://wallet.sobiecki.org"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary hover:text-primary/80 transition-colors inline-flex items-center gap-1"
@@ -223,20 +258,21 @@ export default function Home() {
               </Link>
             </div>
 
-            {/* Wallet */}
+            {/* ETHFinder */}
             <div className="bg-gray-50 p-6 rounded-xl shadow-sm border border-gray-100">
               <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                <Database className="h-6 w-6 text-primary" />
+                <Shield className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Signum Wallet</h3>
+              <h3 className="text-xl font-semibold mb-2">ETHFinder</h3>
               <p className="text-gray-600 mb-4">
-                Portfel webowy obsługujący Arbitrum, Ethereum, Polygon i Base.
-                Umożliwia zakładanie portfeli, przesyłanie tokenów i NFT oraz
-                przeglądanie historii transakcji. Narzędzie ma pełną
-                funkcjonalność, lecz służy głównie celom demonstracyjnym.
+                Bezpieczny generator adresów Ethereum z niestandardowymi
+                wzorcami. Generuje adresy z określonymi prefiksami i sufiksami
+                całkowicie w przeglądarce - bez komunikacji z serwerem,
+                maksymalne bezpieczeństwo. Zawiera kalkulator prawdopodobieństwa
+                i nowoczesny interfejs.
               </p>
               <Link
-                href="https://wallet.sobiecki.org"
+                href="https://ethfinder.org"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary hover:text-primary/80 transition-colors inline-flex items-center gap-1"
@@ -252,7 +288,7 @@ export default function Home() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
                   />
                 </svg>
               </Link>
