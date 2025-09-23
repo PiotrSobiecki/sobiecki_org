@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Menu, Facebook, Code, Layout } from "lucide-react";
+import { Menu, Facebook, Code, Layout, Gamepad2 } from "lucide-react";
 import { Button } from "./button";
 import {
   DropdownMenu,
@@ -7,10 +7,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./dropdown-menu";
+import { Minesweeper } from "../games/minesweeper";
 
 export function Navbar() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+      <Minesweeper />
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -37,6 +39,13 @@ export function Navbar() {
               <Layout className="h-4 w-4" />
               Przykładowe Projekty
             </Link>
+            <button
+              onClick={() => (window as any).openMinesweeper()}
+              className="text-gray-700 hover:text-primary transition-colors flex items-center gap-1"
+            >
+              <Gamepad2 className="h-4 w-4" />
+              Saper
+            </button>
           </nav>
 
           {/* CTA Buttons */}
@@ -77,6 +86,15 @@ export function Navbar() {
                   <Layout className="h-4 w-4" />
                   Przykładowe Projekty
                 </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <button
+                  onClick={() => (window as any).openMinesweeper()}
+                  className="flex items-center gap-2 w-full"
+                >
+                  <Gamepad2 className="h-4 w-4" />
+                  Saper
+                </button>
               </DropdownMenuItem>
               <DropdownMenuItem
                 asChild
