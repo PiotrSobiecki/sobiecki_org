@@ -40,7 +40,11 @@ export function Navbar() {
               Przykładowe Projekty
             </Link>
             <button
-              onClick={() => (window as any).openMinesweeper()}
+              onClick={() =>
+                (
+                  window as unknown as { openMinesweeper: () => void }
+                ).openMinesweeper()
+              }
               className="text-gray-700 hover:text-primary transition-colors flex items-center gap-1"
             >
               <Gamepad2 className="h-4 w-4" />
@@ -89,7 +93,11 @@ export function Navbar() {
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <button
-                  onClick={() => (window as any).openMinesweeper()}
+                  onClick={() =>
+                    (
+                      window as unknown as { openMinesweeper: () => void }
+                    ).openMinesweeper()
+                  }
                   className="flex items-center gap-2 w-full"
                 >
                   <Gamepad2 className="h-4 w-4" />
