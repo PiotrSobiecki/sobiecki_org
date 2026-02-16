@@ -82,7 +82,8 @@ export function Navbar() {
         link.removeEventListener("mouseenter", handler);
       });
     };
-  }, [NAV_ITEMS]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
