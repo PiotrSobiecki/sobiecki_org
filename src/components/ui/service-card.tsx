@@ -1,6 +1,9 @@
 "use client";
 import { useRef, useEffect, useState } from "react";
 
+// HTMLArticleElement is available in DOM types, but we'll use HTMLElement as fallback
+type ArticleElement = HTMLElement;
+
 interface ServiceCardProps {
   service: {
     title: string;
@@ -19,7 +22,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
   isVisible,
   delayStyle,
 }) => {
-  const cardRef = useRef<HTMLArticleElement>(null);
+  const cardRef = useRef<ArticleElement>(null);
   const [isCompactStack, setIsCompactStack] = useState(false);
 
   useEffect(() => {
