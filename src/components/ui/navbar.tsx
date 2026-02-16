@@ -1,128 +1,199 @@
+"use client";
 import Link from "next/link";
-import { Menu, Facebook, Code, Layout, Gamepad2 } from "lucide-react";
-import { Button } from "./button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./dropdown-menu";
+import { useState, useEffect, useRef } from "react";
+import { Facebook, Menu, X, Mail } from "lucide-react";
 import { Minesweeper } from "../games/minesweeper";
 
+const CHARS = "01";
+
 export function Navbar() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
+
+  const NAV_ITEMS = [
+    { label: "usługi", href: "/#uslugi" },
+    { label: "przykładowe projekty", href: "/#projekty" },
+    {
+      label: "saper",
+      href: "#",
+      onClick: () => (window as any).openMinesweeper?.(),
+    },
+  ];
+
+  useEffect(() => {
+    const links = navRef.current?.querySelectorAll("a");
+    if (!links) return;
+
+    const handlers = new Map<HTMLAnchorElement, () => void>();
+    const originalTexts = new Map<HTMLAnchorElement, string>();
+
+    links.forEach((link, index) => {
+      const text = NAV_ITEMS[index]?.label || "";
+      originalTexts.set(link, text);
+      link.dataset.text = text;
+    });
+
+    const scrambleText = (element: HTMLAnchorElement) => {
+      const originalText = originalTexts.get(element) || "";
+      if (!originalText) return;
+
+      const originalWidth = element.offsetWidth;
+      element.style.minWidth = `${originalWidth}px`;
+
+      let iteration = 0;
+      const maxIterations = originalText.length * 3;
+      let currentIteration = 0;
+
+      const interval = setInterval(() => {
+        if (currentIteration >= maxIterations) {
+          element.textContent = originalText;
+          clearInterval(interval);
+          return;
+        }
+
+        element.textContent = originalText
+          .split("")
+          .map((char, index) => {
+            if (char === " ") return " ";
+            if (index < iteration) {
+              return originalText[index];
+            }
+            return CHARS[Math.floor(Math.random() * CHARS.length)];
+          })
+          .join("");
+
+        iteration += 1 / 3;
+        currentIteration++;
+      }, 30);
+    };
+
+    links.forEach((link) => {
+      const handler = () => scrambleText(link);
+      handlers.set(link, handler);
+      link.addEventListener("mouseenter", handler);
+    });
+
+    return () => {
+      handlers.forEach((handler, link) => {
+        link.removeEventListener("mouseenter", handler);
+      });
+    };
+  }, []);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+    document.body.style.overflowY = !isMobileMenuOpen ? "hidden" : "auto";
+  };
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+    <>
       <Minesweeper />
-      <div className="container mx-auto px-4 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <span className="text-2xl font-bold text-primary">
-              Piotr Sobiecki
-            </span>
-            <span className="text-2xl font-bold">Usługi Informatyczne</span>
+      <header className="site-header">
+        <div className="container header__inner">
+          <Link href="/" className="brand">
+            <span className="text-2xl font-bold text-white">sobiecki.org</span>
           </Link>
 
-          {/* Nawigacja desktopowa */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link
-              href="/#uslugi"
-              className="text-gray-700 hover:text-primary transition-colors flex items-center gap-1"
-            >
-              <Code className="h-4 w-4" />
-              Usługi
-            </Link>
-            <Link
-              href="/#projekty"
-              className="text-gray-700 hover:text-primary transition-colors flex items-center gap-1"
-            >
-              <Layout className="h-4 w-4" />
-              Przykładowe Projekty
-            </Link>
-            <button
-              onClick={() =>
-                (
-                  window as unknown as { openMinesweeper: () => void }
-                ).openMinesweeper()
-              }
-              className="text-gray-700 hover:text-primary transition-colors flex items-center gap-1"
-            >
-              <Gamepad2 className="h-4 w-4" />
-              Saper
-            </button>
+          <nav className="site-nav" ref={navRef}>
+            {NAV_ITEMS.map((item) => (
+              <Link
+                key={item.label}
+                href={item.href}
+                onClick={(e) => {
+                  if (item.onClick) {
+                    e.preventDefault();
+                    item.onClick();
+                  }
+                }}
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
 
-          {/* CTA Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
-            {/* Social Media Icons */}
-            <div className="flex space-x-2 mr-4">
-              <Link
-                href="https://www.facebook.com/piotr.sobiecki.33"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-primary hover:text-white transition-colors"
-                aria-label="Facebook"
-              >
-                <Facebook className="h-4 w-4" />
-              </Link>
-            </div>
-            <Link href="#kontakt">
-              <Button>Skontaktuj się</Button>
+          <div className="header__cta">
+            <Link
+              href="https://www.facebook.com/piotr.sobiecki.33"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-12 h-12 flex items-center justify-center border border-white/40 hover:border-white hover:bg-white/10 transition-colors"
+              aria-label="Facebook"
+            >
+              <Facebook className="h-5 w-5" />
             </Link>
-          </div>
-
-          {/* Menu mobilne */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon">
+            <Link href="#kontakt" className="btn btn_primary hidden md:inline-flex">
+              Kontakt
+            </Link>
+            <button
+              className="button_mobile"
+              onClick={toggleMobileMenu}
+              aria-label="Open mobile menu"
+            >
+              {isMobileMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
                 <Menu className="h-6 w-6" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem asChild>
-                <Link href="/#uslugi" className="flex items-center gap-2">
-                  <Code className="h-4 w-4" />
-                  Usługi
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/#projekty" className="flex items-center gap-2">
-                  <Layout className="h-4 w-4" />
-                  Przykładowe Projekty
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <button
-                  onClick={() =>
-                    (
-                      window as unknown as { openMinesweeper: () => void }
-                    ).openMinesweeper()
-                  }
-                  className="flex items-center gap-2 w-full"
-                >
-                  <Gamepad2 className="h-4 w-4" />
-                  Saper
-                </button>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                asChild
-                className="flex justify-between items-center"
-              >
-                <div className="flex space-x-2">
-                  <a
-                    href="https://www.facebook.com/piotr.sobiecki.33"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Facebook"
-                  >
-                    <Facebook className="h-4 w-4" />
-                  </a>
-                </div>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              )}
+            </button>
+          </div>
         </div>
+      </header>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/35 backdrop-blur-sm z-[110] opacity-100 transition-opacity"
+          onClick={toggleMobileMenu}
+          aria-hidden="true"
+        />
+      )}
+      <div
+        className={`fixed top-[88px] right-4 max-w-[360px] w-[calc(100%-28px)] bg-[#050505] border border-white/12 rounded-xl p-4 flex flex-col gap-4 shadow-2xl z-[110] transition-all ${
+          isMobileMenuOpen
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 pointer-events-none -translate-y-2"
+        }`}
+      >
+        <div className="flex items-center justify-between">
+          <p className="text-xs uppercase tracking-widest text-white/55">
+            menu
+          </p>
+          <button
+            className="w-10 h-10 border border-white/40 rounded-md flex items-center justify-center text-white"
+            onClick={toggleMobileMenu}
+            aria-label="Close menu"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        <nav className="flex flex-col gap-1.5" style={{ fontFamily: '"Courier New", monospace' }}>
+          {NAV_ITEMS.map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              onClick={(e) => {
+                if (item.onClick) {
+                  e.preventDefault();
+                  item.onClick();
+                }
+                toggleMobileMenu();
+              }}
+              className="block text-white text-base lowercase tracking-widest py-3 border-b border-white/8"
+              style={{ fontFamily: '"Courier New", monospace' }}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+        <Link
+          href="#kontakt"
+          className="btn btn_primary w-full justify-center"
+          onClick={toggleMobileMenu}
+          style={{ fontFamily: '"Courier New", monospace' }}
+        >
+          Skontaktuj się
+        </Link>
       </div>
-    </header>
+    </>
   );
 }

@@ -1,13 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Accessibility,
   Eye,
   MonitorSmartphone,
   Text,
-  Moon,
-  Sun,
   X,
 } from "lucide-react";
 
@@ -16,7 +14,25 @@ export function AccessibilityWidget() {
   const [highContrast, setHighContrast] = useState(false);
   const [largeText, setLargeText] = useState(false);
   const [dyslexicFont, setDyslexicFont] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Alt+1 (lub Option+1 na Mac)
+      if ((e.altKey || e.metaKey) && e.key === "1") {
+        e.preventDefault();
+        const mainContent = document.querySelector("main");
+        if (mainContent) {
+          mainContent.focus();
+          mainContent.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -35,11 +51,6 @@ export function AccessibilityWidget() {
   const toggleDyslexicFont = () => {
     setDyslexicFont(!dyslexicFont);
     document.documentElement.classList.toggle("dyslexic-font");
-  };
-
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    document.documentElement.classList.toggle("dark");
   };
 
   return (
@@ -139,22 +150,22 @@ export function AccessibilityWidget() {
 
       <button
         onClick={toggleMenu}
-        className="fixed bottom-6 right-6 p-3 bg-primary text-white rounded-full shadow-lg z-50 hover:bg-primary/90 transition-colors"
+        className="fixed bottom-6 right-6 p-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-full shadow-lg z-50 transition-colors backdrop-blur-sm"
         aria-label="Ustawienia dostępności"
       >
         <Accessibility className="h-6 w-6" />
       </button>
 
       {isOpen && (
-        <div className="fixed bottom-20 right-6 bg-white rounded-xl shadow-xl p-4 z-50 w-64 border border-gray-200 animate-in fade-in slide-in-from-right-5">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="font-bold text-lg">Dostępność</h3>
+        <div className="fixed bottom-20 right-6 bg-[#000000] border-2 border-white rounded-xl shadow-xl p-5 z-50 w-72 animate-in fade-in slide-in-from-right-5" style={{ fontFamily: '"Courier New", monospace' }}>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="font-bold text-xl text-white text-left" style={{ fontSize: "1.25rem", fontWeight: 600 }}>Dostępność</h3>
             <button
               onClick={toggleMenu}
-              className="text-gray-500 hover:text-gray-700"
+              className="text-white hover:text-white transition-colors"
               aria-label="Zamknij menu dostępności"
             >
-              <X className="h-5 w-5" />
+              <X className="h-6 w-6" />
             </button>
           </div>
 
@@ -162,62 +173,49 @@ export function AccessibilityWidget() {
             <li>
               <button
                 onClick={toggleHighContrast}
-                className={`flex items-center w-full p-2 rounded-lg ${
+                className={`flex items-center w-full p-3 rounded-lg transition-colors text-left ${
                   highContrast
-                    ? "bg-primary/10 text-primary"
-                    : "hover:bg-gray-100"
+                    ? "bg-white text-black border-2 border-white"
+                    : "hover:bg-white/20 text-white border border-white/40"
                 }`}
+                style={{ fontSize: "1rem", fontWeight: 500 }}
                 aria-pressed={highContrast}
               >
-                <MonitorSmartphone className="h-5 w-5 mr-3" />
-                <span>Wysoki kontrast</span>
+                <MonitorSmartphone className="h-6 w-6 mr-3 flex-shrink-0" />
+                <span className="text-left">Wysoki kontrast</span>
               </button>
             </li>
             <li>
               <button
                 onClick={toggleLargeText}
-                className={`flex items-center w-full p-2 rounded-lg ${
-                  largeText ? "bg-primary/10 text-primary" : "hover:bg-gray-100"
+                className={`flex items-center w-full p-3 rounded-lg transition-colors text-left ${
+                  largeText ? "bg-white text-black border-2 border-white" : "hover:bg-white/20 text-white border border-white/40"
                 }`}
+                style={{ fontSize: "1rem", fontWeight: 500 }}
                 aria-pressed={largeText}
               >
-                <Text className="h-5 w-5 mr-3" />
-                <span>Powiększony tekst</span>
+                <Text className="h-6 w-6 mr-3 flex-shrink-0" />
+                <span className="text-left">Powiększony tekst</span>
               </button>
             </li>
             <li>
               <button
                 onClick={toggleDyslexicFont}
-                className={`flex items-center w-full p-2 rounded-lg ${
+                className={`flex items-center w-full p-3 rounded-lg transition-colors text-left ${
                   dyslexicFont
-                    ? "bg-primary/10 text-primary"
-                    : "hover:bg-gray-100"
+                    ? "bg-white text-black border-2 border-white"
+                    : "hover:bg-white/20 text-white border border-white/40"
                 }`}
+                style={{ fontSize: "1rem", fontWeight: 500 }}
                 aria-pressed={dyslexicFont}
               >
-                <Eye className="h-5 w-5 mr-3" />
-                <span>Czcionka dla dysleksji</span>
-              </button>
-            </li>
-            <li>
-              <button
-                onClick={toggleDarkMode}
-                className={`flex items-center w-full p-2 rounded-lg ${
-                  darkMode ? "bg-primary/10 text-primary" : "hover:bg-gray-100"
-                }`}
-                aria-pressed={darkMode}
-              >
-                {darkMode ? (
-                  <Sun className="h-5 w-5 mr-3" />
-                ) : (
-                  <Moon className="h-5 w-5 mr-3" />
-                )}
-                <span>Tryb ciemny</span>
+                <Eye className="h-6 w-6 mr-3 flex-shrink-0" />
+                <span className="text-left">Czcionka dla dysleksji</span>
               </button>
             </li>
           </ul>
 
-          <p className="text-xs text-gray-500 mt-4">
+          <p className="text-sm text-white mt-5 text-left" style={{ fontSize: "0.875rem", fontWeight: 400 }}>
             Naciśnij Alt+1 aby przejść do głównej zawartości
           </p>
         </div>

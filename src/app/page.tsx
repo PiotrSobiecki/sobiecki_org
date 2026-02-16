@@ -2,16 +2,107 @@
 import { Navbar } from "@/components/ui/navbar";
 import { HeroSection } from "@/components/ui/hero-section";
 import { Footer } from "@/components/ui/footer";
+import { ProjectCard } from "@/components/ui/project-card";
+import { ServiceCard } from "@/components/ui/service-card";
+import { BinaryBackground } from "@/components/ui/binary-background";
 import Link from "next/link";
-import { Code, Database, Bot, Download, Shield } from "lucide-react";
-import { useRef, useState } from "react";
+import { Code, Database, Bot, Shield, Mail } from "lucide-react";
+import { useRef, useState, useMemo } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
+import useRevealOnIntersect from "@/hooks/useRevealOnIntersect";
+import { getRevealStyle } from "@/utils/reveal";
 
 export default function Home() {
   const recaptchaRef = useRef<ReCAPTCHA>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+
+  const { ref: projectsRef, isVisible: isProjectsVisible } =
+    useRevealOnIntersect({
+      threshold: 0.08,
+      rootMargin: "-5% 0px",
+    });
+
+  const { ref: servicesRef, isVisible: isServicesVisible } =
+    useRevealOnIntersect({
+      threshold: 0.08,
+      rootMargin: "0px",
+    });
+
+  const services = [
+    {
+      title: "Aplikacje Webowe",
+      description:
+        "Tworzenie nowoczesnych aplikacji i stron internetowych dopasowanych do indywidualnych potrzeb.",
+      category: "Development",
+      accentImage:
+        "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&q=80",
+    },
+    {
+      title: "Blockchain",
+      description:
+        "Analiza danych blockchain – przetwarzanie logów, generowanie statystyk i monitorowanie aktywności.",
+      category: "Analytics",
+      accentImage:
+        "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&q=80",
+    },
+    {
+      title: "Boty",
+      description:
+        "Budowa botów do monitorowania i powiadamiania o wybranych zdarzeniach on-chain.",
+      category: "Automation",
+      accentImage:
+        "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80",
+    },
+  ];
+
+  const projects = [
+    {
+      name: "OddajHajs",
+      description:
+        "Platforma do zarządzania wspólnymi wydatkami. Umożliwia łatwe rozliczanie się między znajomymi, współlokatorami czy członkami grupy. Dodatkowo oferuje czat, kalendarz oraz system przypomnień, co ułatwia komunikację i organizację rozliczeń.",
+      url: "https://oddajhajs.org",
+    },
+    {
+      name: "Signum Wallet",
+      description:
+        "Portfel webowy obsługujący Arbitrum, Ethereum, Polygon i Base. Umożliwia zakładanie portfeli, przesyłanie tokenów i NFT oraz przeglądanie historii transakcji. Narzędzie ma pełną funkcjonalność, lecz służy głównie celom demonstracyjnym.",
+      url: "https://wallet.sobiecki.org",
+    },
+    {
+      name: "MindWander",
+      description:
+        "Rozszerzenie do przeglądarki pomagające odkrywać nowe tematy poza bańką informacyjną. Wykorzystuje AI do proponowania zaskakujących połączeń między zagadnieniami. Oferuje analizę treści, kreatywne wyszukiwanie, sugestie i nieinwazyjny interfejs.",
+      url: "https://mind-wander.org",
+    },
+    {
+      name: "ETHFinder",
+      description:
+        "Bezpieczny generator adresów Ethereum z niestandardowymi wzorcami. Generuje adresy z określonymi prefiksami i sufiksami całkowicie w przeglądarce - bez komunikacji z serwerem, maksymalne bezpieczeństwo. Zawiera kalkulator prawdopodobieństwa i nowoczesny interfejs.",
+      url: "https://ethfinder.org",
+    },
+  ];
+
+  const sectionHeaderStyle = useMemo(
+    () => getRevealStyle(isProjectsVisible, { offset: 35, duration: "1s" }),
+    [isProjectsVisible],
+  );
+
+  const servicesHeaderStyle = useMemo(
+    () => getRevealStyle(isServicesVisible, { offset: 35, duration: "1s" }),
+    [isServicesVisible],
+  );
+
+  const getCardStyle = (index: number) =>
+    getRevealStyle(isProjectsVisible, {
+      delay: index * 70,
+      offset: 55,
+    });
+
+  const getServiceCardDelayStyle = (index: number) => ({
+    transitionDelay: `${index * 140 + 200}ms`,
+  });
 
   const recaptchaSiteKey = "6Lc2IT8rAAAAANLZruh6aCBQCvm0xuIg67Ek-hQK";
 
@@ -51,7 +142,7 @@ export default function Home() {
 
       if (!res.ok) {
         throw new Error(
-          data.error || "Wystąpił błąd podczas wysyłania wiadomości."
+          data.error || "Wystąpił błąd podczas wysyłania wiadomości.",
         );
       }
 
@@ -60,7 +151,7 @@ export default function Home() {
       recaptcha?.reset();
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Wystąpił nieoczekiwany błąd."
+        err instanceof Error ? err.message : "Wystąpił nieoczekiwany błąd.",
       );
     } finally {
       setLoading(false);
@@ -68,251 +159,87 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen">
-      {/* Top CTA bar */}
-      <div className="bg-primary text-white py-2 text-center">
-        <div className="container mx-auto px-4 flex justify-center md:justify-between items-center">
-          <p className="hidden md:block font-medium">
-            Profesjonalne usługi informatyczne - wsparcie IT na najwyższym
-            poziomie
-          </p>
-          <Link
-            href="#kontakt"
-            className="hidden md:flex items-center gap-2 bg-white text-primary px-4 py-1.5 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors"
-          >
-            <Download className="h-4 w-4" />
-            Skontaktuj się
-          </Link>
-        </div>
-      </div>
-
+    <main className="min-h-screen bg-[#0a0a0a]" tabIndex={-1}>
       <Navbar />
       <HeroSection />
 
       {/* Sekcja Usługi */}
-      <section id="uslugi" className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Moje Usługi</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Oferuję kompleksowe rozwiązania IT dostosowane do Twoich potrzeb
-            </p>
+      <section id="uslugi" className="services" ref={servicesRef}>
+        <div className="container">
+          <div
+            className={`section-header services__intro ${
+              isServicesVisible ? "services__intro--visible" : ""
+            }`}
+            style={servicesHeaderStyle}
+          >
+            <p className="eyebrow">usługi</p>
+            <h2>Kompleksowe rozwiązania IT dostosowane do Twoich potrzeb</h2>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Aplikacje Webowe */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                <Code className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Aplikacje Webowe</h3>
-              <p className="text-gray-600">
-                Tworzenie nowoczesnych aplikacji i stron internetowych
-                dopasowanych do indywidualnych potrzeb.
-              </p>
-            </div>
-
-            {/* Blockchain */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                <Database className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Blockchain</h3>
-              <p className="text-gray-600">
-                Analiza danych blockchain – przetwarzanie logów, generowanie
-                statystyk i monitorowanie aktywności.
-              </p>
-            </div>
-
-            {/* Boty */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                <Bot className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Boty</h3>
-              <p className="text-gray-600">
-                Budowa botów do monitorowania i powiadamiania o wybranych
-                zdarzeniach on-chain.
-              </p>
-            </div>
+          <div className="services__stack">
+            {services.map((service, index) => (
+              <ServiceCard
+                key={service.title}
+                service={service}
+                index={index}
+                isVisible={isServicesVisible}
+                delayStyle={getServiceCardDelayStyle(index)}
+              />
+            ))}
           </div>
         </div>
       </section>
 
       {/* Sekcja Przykładowe Aplikacje */}
-      <section id="projekty" className="py-20 bg-white">
-        <div className="container mx-auto px-4 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Przykładowe Projekty
-            </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Zobacz przykłady moich realizacji
-            </p>
+      <section
+        id="projekty"
+        className="projects section-with-video"
+        ref={projectsRef}
+      >
+        <video className="section-bg-video" autoPlay muted loop playsInline>
+          <source src="/images/kafelek.mp4" type="video/mp4" />
+        </video>
+        <div className="container">
+          <div className="section-header" style={sectionHeaderStyle}>
+            <p className="eyebrow">projekty</p>
+            <h2>Przykładowe Projekty</h2>
+            <p>Zobacz przykłady moich realizacji</p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* OddajHajs */}
-            <div className="bg-gray-50 p-6 rounded-xl shadow-sm border border-gray-100">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                <Code className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">OddajHajs</h3>
-              <p className="text-gray-600 mb-4">
-                Platforma do zarządzania wspólnymi wydatkami. Umożliwia łatwe
-                rozliczanie się między znajomymi, współlokatorami czy członkami
-                grupy. Dodatkowo oferuje czat, kalendarz oraz system
-                przypomnień, co ułatwia komunikację i organizację rozliczeń.
-              </p>
-              <Link
-                href="https://oddajhajs.org"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:text-primary/80 transition-colors inline-flex items-center gap-1"
-              >
-                Odwiedź stronę
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                  />
-                </svg>
-              </Link>
-            </div>
-
-            {/* Signum Wallet */}
-            <div className="bg-gray-50 p-6 rounded-xl shadow-sm border border-gray-100">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                <Database className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Signum Wallet</h3>
-              <p className="text-gray-600 mb-4">
-                Portfel webowy obsługujący Arbitrum, Ethereum, Polygon i Base.
-                Umożliwia zakładanie portfeli, przesyłanie tokenów i NFT oraz
-                przeglądanie historii transakcji. Narzędzie ma pełną
-                funkcjonalność, lecz służy głównie celom demonstracyjnym.
-              </p>
-              <Link
-                href="https://wallet.sobiecki.org"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:text-primary/80 transition-colors inline-flex items-center gap-1"
-              >
-                Odwiedź stronę
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                  />
-                </svg>
-              </Link>
-            </div>
-
-            {/* MindWander */}
-            <div className="bg-gray-50 p-6 rounded-xl shadow-sm border border-gray-100">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                <Code className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">MindWander</h3>
-              <p className="text-gray-600 mb-4">
-                Rozszerzenie do przeglądarki pomagające odkrywać nowe tematy
-                poza bańką informacyjną. Wykorzystuje AI do proponowania
-                zaskakujących połączeń między zagadnieniami. Oferuje analizę
-                treści, kreatywne wyszukiwanie, sugestie i nieinwazyjny
-                interfejs.
-              </p>
-              <Link
-                href="https://mind-wander.org"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:text-primary/80 transition-colors inline-flex items-center gap-1"
-              >
-                Odwiedź stronę
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                  />
-                </svg>
-              </Link>
-            </div>
-
-            {/* ETHFinder */}
-            <div className="bg-gray-50 p-6 rounded-xl shadow-sm border border-gray-100">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                <Shield className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">ETHFinder</h3>
-              <p className="text-gray-600 mb-4">
-                Bezpieczny generator adresów Ethereum z niestandardowymi
-                wzorcami. Generuje adresy z określonymi prefiksami i sufiksami
-                całkowicie w przeglądarce - bez komunikacji z serwerem,
-                maksymalne bezpieczeństwo. Zawiera kalkulator prawdopodobieństwa
-                i nowoczesny interfejs.
-              </p>
-              <Link
-                href="https://ethfinder.org"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:text-primary/80 transition-colors inline-flex items-center gap-1"
-              >
-                Odwiedź stronę
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                  />
-                </svg>
-              </Link>
-            </div>
+          <div className="projects__grid">
+            {projects.map((project, index) => (
+              <ProjectCard
+                key={project.name}
+                {...project}
+                style={getCardStyle(index)}
+              />
+            ))}
           </div>
         </div>
       </section>
 
       {/* Sekcja Kontakt */}
-      <section id="kontakt" className="py-20">
-        <div className="container mx-auto px-4 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Kontakt</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Skontaktuj się ze mną, aby omówić Twoje potrzeby
-            </p>
+      <section id="kontakt" className="section resources">
+        <BinaryBackground />
+        <div className="container">
+          <div
+            className="section-header"
+            style={{
+              textAlign: "center",
+              marginTop: "20px",
+              marginBottom: "20px",
+              marginLeft: "auto",
+              marginRight: "auto",
+            }}
+          >
+            <h2>Kontakt</h2>
+            <p>Skontaktuj się ze mną, aby omówić Twoje potrzeby</p>
           </div>
 
-          <div className="max-w-xl mx-auto bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+          <div className="max-w-xl mx-auto card">
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div>
                 <label
                   htmlFor="name"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-white/80 mb-1"
                 >
                   Imię i nazwisko
                 </label>
@@ -321,13 +248,13 @@ export default function Home() {
                   id="name"
                   name="name"
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                  className="w-full px-4 py-2 bg-[#0a0a0a] border border-white/20 text-white focus:ring-2 focus:ring-white focus:border-white"
                 />
               </div>
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-white/80 mb-1"
                 >
                   Email
                 </label>
@@ -336,13 +263,13 @@ export default function Home() {
                   id="email"
                   name="email"
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                  className="w-full px-4 py-2 bg-[#0a0a0a] border border-white/20 text-white focus:ring-2 focus:ring-white focus:border-white"
                 />
               </div>
               <div>
                 <label
                   htmlFor="message"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-white/80 mb-1"
                 >
                   Wiadomość
                 </label>
@@ -351,7 +278,7 @@ export default function Home() {
                   name="message"
                   rows={4}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                  className="w-full px-4 py-2 bg-[#0a0a0a] border border-white/20 text-white focus:ring-2 focus:ring-white focus:border-white"
                 ></textarea>
               </div>
               <div className="flex justify-center">
@@ -359,7 +286,7 @@ export default function Home() {
                   ref={recaptchaRef}
                   sitekey={recaptchaSiteKey}
                   size="normal"
-                  theme="light"
+                  theme="dark"
                   onChange={(token) => {
                     if (!token) {
                       setError("Potwierdź, że nie jesteś robotem.");
@@ -370,12 +297,12 @@ export default function Home() {
                 />
               </div>
               {success && (
-                <div className="text-green-600 text-sm">{success}</div>
+                <div className="text-green-400 text-sm">{success}</div>
               )}
-              {error && <div className="text-red-600 text-sm">{error}</div>}
+              {error && <div className="text-red-400 text-sm">{error}</div>}
               <button
                 type="submit"
-                className="w-full bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-60"
+                className="btn btn_primary w-full"
                 disabled={loading}
               >
                 {loading ? "Wysyłanie..." : "Wyślij wiadomość"}
