@@ -1,24 +1,28 @@
 "use client";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import { Facebook, Menu, X, Mail } from "lucide-react";
+import { Facebook, Menu, X } from "lucide-react";
 import { Minesweeper } from "../games/minesweeper";
 
 const CHARS = "01";
 
+const NAV_ITEMS = [
+  { label: "usługi", href: "/#uslugi" },
+  { label: "przykładowe projekty", href: "/#projekty" },
+  {
+    label: "saper",
+    href: "#",
+    onClick: () => {
+      if (typeof window !== "undefined" && "openMinesweeper" in window) {
+        (window as { openMinesweeper?: () => void }).openMinesweeper?.();
+      }
+    },
+  },
+];
+
 export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
-
-  const NAV_ITEMS = [
-    { label: "usługi", href: "/#uslugi" },
-    { label: "przykładowe projekty", href: "/#projekty" },
-    {
-      label: "saper",
-      href: "#",
-      onClick: () => (window as any).openMinesweeper?.(),
-    },
-  ];
 
   useEffect(() => {
     const links = navRef.current?.querySelectorAll("a");
@@ -78,7 +82,7 @@ export function Navbar() {
         link.removeEventListener("mouseenter", handler);
       });
     };
-  }, []);
+  }, [NAV_ITEMS]);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
