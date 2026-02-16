@@ -10,9 +10,11 @@ export const metadata: Metadata = {
   description:
     " - tworzenie aplikacji webowych, analiza danych blockchain, budowa botów i doradztwo IT",
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/favicon.ico",
+    icon: [
+      { url: "/icon.png", type: "image/png" },
+    ],
+    shortcut: "/icon.png",
+    apple: "/icon.png",
   },
 };
 
@@ -28,9 +30,9 @@ export default function RootLayout({
         <meta name="theme-color" content="#8B5CF6" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="shortcut icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/favicon.ico" />
+        <link rel="icon" href="/icon.png" type="image/png" />
+        <link rel="shortcut icon" href="/icon.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/icon.png" />
         <meta
           name="description"
           content="Profesjonalne usługi informatyczne - tworzenie aplikacji webowych, analiza danych blockchain, budowa botów i doradztwo IT."

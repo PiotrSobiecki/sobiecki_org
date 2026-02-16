@@ -237,6 +237,12 @@ textarea::placeholder {
   font-weight: 500;
 }
 
+@media (max-width: 768px) {
+  .site-header .header__cta .btn.btn_primary {
+    display: none !important;
+  }
+}
+
 .site-header .header__cta .btn.btn_primary:hover {
   background: rgba(255, 255, 255, 0.9) !important;
   border-color: rgba(255, 255, 255, 0.9) !important;
