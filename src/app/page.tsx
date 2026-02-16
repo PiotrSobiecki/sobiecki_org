@@ -5,8 +5,6 @@ import { Footer } from "@/components/ui/footer";
 import { ProjectCard } from "@/components/ui/project-card";
 import { ServiceCard } from "@/components/ui/service-card";
 import { BinaryBackground } from "@/components/ui/binary-background";
-import Link from "next/link";
-import { Code, Database, Bot, Shield, Mail } from "lucide-react";
 import { useRef, useState, useMemo } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import useRevealOnIntersect from "@/hooks/useRevealOnIntersect";
