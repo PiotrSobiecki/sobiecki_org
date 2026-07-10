@@ -102,12 +102,8 @@ export default function Home() {
     transitionDelay: `${index * 140 + 200}ms`,
   });
 
-  const recaptchaSiteKey = "***RECAPTCHA_SECRET_REMOVED***";
-
-  if (!recaptchaSiteKey) {
-    console.error("Brak klucza reCAPTCHA!");
-    return null;
-  }
+  // Wstrzykiwany przy buildzie — Dockerfile musi podać ten ARG, inaczej będzie undefined.
+  const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -280,19 +276,25 @@ export default function Home() {
                 ></textarea>
               </div>
               <div className="flex justify-center">
-                <ReCAPTCHA
-                  ref={recaptchaRef}
-                  sitekey={recaptchaSiteKey}
-                  size="normal"
-                  theme="dark"
-                  onChange={(token) => {
-                    if (!token) {
-                      setError("Potwierdź, że nie jesteś robotem.");
-                    } else {
-                      setError("");
-                    }
-                  }}
-                />
+                {!recaptchaSiteKey ? (
+                  <p className="text-sm text-red-400">
+                    Formularz jest chwilowo niedostępny.
+                  </p>
+                ) : (
+                  <ReCAPTCHA
+                    ref={recaptchaRef}
+                    sitekey={recaptchaSiteKey}
+                    size="normal"
+                    theme="dark"
+                    onChange={(token) => {
+                      if (!token) {
+                        setError("Potwierdź, że nie jesteś robotem.");
+                      } else {
+                        setError("");
+                      }
+                    }}
+                  />
+                )}
               </div>
               {success && (
                 <div className="text-green-400 text-sm">{success}</div>
