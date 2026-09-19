@@ -9,7 +9,7 @@ zależności nie oznacza braku błędów aplikacji.
 
 | Priorytet | Ustalenie | Status |
 |---|---|---|
-| Krytyczny | Lockfile zawierał Next.js 15.5.20 z podatnościami RCE zgłoszonymi przez GitHub, a także podatne sharp, postcss, js-yaml i brace-expansion. | Next.js 15.5.25, sharp 0.35.4, postcss 8.5.28 (override w manifeście), js-yaml 4.3.2, brace-expansion 1.1.21 i 5.0.12 — wszystkie powyżej wersji naprawczych z alertów. Autoprefixer i browserslist zniknęły z drzewa razem z czyszczeniem manifestu. |
+| Krytyczny | Lockfile zawierał Next.js 15.5.20 z podatnościami RCE zgłoszonymi przez GitHub, a także podatne sharp, postcss, js-yaml i brace-expansion. | Next.js 15.5.25, sharp 0.35.4, postcss 8.5.28 (override w manifeście), js-yaml 4.3.2, brace-expansion 1.1.21 i 5.0.12 — wszystkie powyżej wersji naprawczych z alertów. Po pushu GitHub zamknął wszystkie 20 zgłoszeń. Autoprefixer i browserslist zniknęły z drzewa razem z czyszczeniem manifestu. |
 | Wysoki | `.dockerignore` nie wykluczał plików konfiguracji środowiska, `.git` i `.next`; `COPY . .` dołączało je do etapu budowania. | Poprawiono wykluczenia. Nie badano istniejących obrazów ani cache na serwerze. |
 | Średni | API czytało cały JSON przed sprawdzeniem rozmiaru; limity pól nie ograniczały pamięci zużytej podczas parsowania. | Limit rzeczywistych bajtów strumienia: 40 000, odpowiedź 413; walidacja przed wywołaniem usług zewnętrznych. |
 | Średni | Weryfikacja CAPTCHA była poza obsługą błędów, bez timeoutu, a sekret był w URL. | Timeout, POST body, kontrolowane błędy 502 i zamknięta ścieżka wysyłki przy nieudanej weryfikacji. |
@@ -32,13 +32,10 @@ zależności nie oznacza braku błędów aplikacji.
    wdrożenie `deploy/nginx-contact.conf` i `deploy/nginx-contact-location.conf`
    na serwerze; pliki w repo nie są wdrożeniem. Port 3000 musi być wtedy
    dostępny wyłącznie lokalnie, inaczej limit proxy da się ominąć.
-2. **Alerty Dependabota odnoszą się do wypchniętego lockfile'a.** Nowe wersje
-   pokrywają wszystkie otwarte zgłoszenia, ale zamknięcie alertów potwierdzi
-   dopiero odczyt po pushu.
-3. **Smoke test przeglądarkowy nie działa w CI.** `tests/ui_smoke.py` wymaga
+2. **Smoke test przeglądarkowy nie działa w CI.** `tests/ui_smoke.py` wymaga
    Pythona, przeglądarki Playwright i uruchomionego serwera na porcie 3100;
    uruchamiany ręcznie przed wdrożeniem.
-4. **Indeksowanie wymaga dostępu do konta Google.** Weryfikacja własności
+3. **Indeksowanie wymaga dostępu do konta Google.** Weryfikacja własności
    `sobiecki.org` i zgłoszenie mapy witryny w Search Console pozostają po
    stronie właściciela. Mapa nie gwarantuje indeksacji ani pozycji.
 
@@ -50,7 +47,8 @@ tej podstawie XSS. Nie znaleziono śledzonych plików konfiguracji środowiska,
 
 - Zależności: gałąź zrównana z `origin/main` (automatyczny PR Dependabota #1),
   zakresy wersji z tego PR-a przeniesione do wyczyszczonego manifestu.
-  `npm ci` i `npm audit --audit-level=low`: 0 podatności.
+  `npm ci` i `npm audit --audit-level=low`: 0 podatności. Po pushu CI na main
+  zaliczone, lista alertów Dependabota pusta.
 - Dependabot: npm i GitHub Actions, poniedziałek 07:00 Europe/Warsaw.
   Majory wymagają ręcznego przeglądu. Automatyczne security fixes nie były włączane.
 - Resend: `RESEND_API_KEY`, `RESEND_FROM`, `MAIL_TO`; Google nadal odpowiada za CAPTCHA.
