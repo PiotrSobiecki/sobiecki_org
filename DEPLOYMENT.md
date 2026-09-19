@@ -1,4 +1,13 @@
-# Przewodnik wdrożenia na Hostingera
+# Przewodnik wdrożenia
+
+## Aktualne wdrożenie produkcyjne
+
+`sobiecki.org` działa na Railway (edge `waw1`) z automatycznym wdrożeniem po
+pushu na `main`. DNS domeny obsługuje Cloudflare w trybie DNS only — ruch idzie
+prosto na Railway, więc przed aplikacją nie ma reverse proxy pod naszą kontrolą.
+
+Opisane niżej wdrożenia na Hostingerze są alternatywą na wypadek migracji,
+nie opisem tego, co działa teraz.
 
 ## Wymagane zmienne środowiskowe
 
@@ -25,22 +34,19 @@ Dokumentacja API: https://resend.com/docs/api-reference/emails/send-email
 
 API ogranicza wszystkie próby do 30 na minutę na proces (odpowiedź 429 i
 `Retry-After`), bez polegania na nagłówkach IP dostarczonych przez klienta.
-Odbieranie body ma limit 10 sekund i 40 000 bajtów. Limit w aplikacji resetuje
-się przy restarcie; nie jest wspólny dla kilku instancji.
+Odbieranie body ma limit 10 sekund i 40 000 bajtów.
 
-Dla produkcyjnego Nginx przygotowane są dwa pliki:
+Na Railway jest to jedyna warstwa limitu. Licznik jest lokalny dla procesu:
+resetuje się przy restarcie i nie obejmuje pozostałych instancji, gdy działa
+ich więcej niż jedna. Limit wspólny wymagałby warstwy przed aplikacją — reguły
+Cloudflare po włączeniu proxy na rekordzie domeny albo własny reverse proxy.
 
-1. `deploy/nginx-contact.conf` — dołącz w kontekście `http {}`; tworzy współdzielone
-   strefy ograniczające ruch łącznie i per IP.
-2. `deploy/nginx-contact-location.conf` — dołącz wewnątrz istniejącego wirtualnego
-   hosta HTTPS `server {}`; kieruje formularz na `127.0.0.1:3000`.
-
-Dopasuj upstream do hostingu. Gdy Nginx jest za CDN/proxy, odtwarzaj prawdziwe IP
-wyłącznie z adresów tego zaufanego proxy. Nigdy nie ufaj nagłówkom IP ze wszystkich
-adresów. Port aplikacji 3000 powinien być dostępny tylko lokalnie, np. Docker
-`-p 127.0.0.1:3000:3000`, aby nie można było ominąć limitu proxy.
-Po dołączeniu plików uruchom `nginx -t` i dopiero wtedy przeładuj Nginx.
-Pliki w repo nie oznaczają, że reguły są już wdrożone na serwerze.
+`deploy/nginx-contact.conf` i `deploy/nginx-contact-location.conf` to gotowe
+reguły dla Nginx na wypadek przeniesienia na VPS; nigdzie nie są wdrożone.
+Pierwszy dołącza się w kontekście `http {}`, drugi wewnątrz wirtualnego hosta
+HTTPS. Port 3000 musi być wtedy dostępny wyłącznie lokalnie
+(`-p 127.0.0.1:3000:3000`), a prawdziwe IP odtwarzane tylko z adresów zaufanego
+proxy. Po dołączeniu plików `nginx -t`, dopiero potem przeładowanie.
 
 ## Indeksowanie w Google
 
@@ -53,7 +59,7 @@ strony głównej i poproś o indeksowanie, jeśli Google jeszcze go nie zna.
 Weryfikacja własności i zgłoszenie w Search Console wymagają dostępu do konta.
 Sitemap pomaga wykrywać strony, ale nie gwarantuje indeksacji ani pozycji.
 
-## Opcja 1: Hostinger VPS (Zalecane - Docker)
+## Migracja: Hostinger VPS (Docker)
 
 Jeśli masz VPS na Hostingerze, możesz użyć Dockera:
 
@@ -151,7 +157,7 @@ sudo apt install certbot python3-certbot-nginx
 sudo certbot --nginx -d sobiecki.org -d www.sobiecki.org
 ```
 
-## Opcja 2: Hostinger Cloud Hosting (Node.js)
+## Migracja: Hostinger Cloud Hosting (Node.js)
 
 Jeśli masz Cloud Hosting z obsługą Node.js:
 
@@ -196,7 +202,7 @@ W panelu Hostingera (Node.js App) dodaj zmienne środowiskowe lub utwórz plik `
 
 W panelu Hostingera uruchom aplikację Node.js.
 
-## Opcja 3: Hostinger Shared Hosting (NIE ZALECANE)
+## Migracja: Hostinger Shared Hosting (nie zalecane)
 
 Shared Hosting zazwyczaj nie obsługuje aplikacji Next.js. Jeśli musisz użyć Shared Hosting, rozważ:
 
@@ -204,6 +210,11 @@ Shared Hosting zazwyczaj nie obsługuje aplikacji Next.js. Jeśli musisz użyć 
 2. **Przenieś się na VPS lub Cloud Hosting**
 
 ## Aktualizacja aplikacji
+
+### Na Railway (obecnie):
+
+Push na `main` uruchamia CI i wdrożenie. Zmienne środowiskowe ustawia się
+w panelu Railway, nie w repo.
 
 ### Dla Dockera:
 
@@ -231,7 +242,7 @@ docker run -d \
 
 ### Aplikacja nie startuje
 
-- Sprawdź logi: `docker logs sobiecki-org` (Docker) lub logi w panelu Hostingera
+- Sprawdź logi: panel Railway, `docker logs sobiecki-org` (Docker) lub panel Hostingera
 - Sprawdź, czy wszystkie zmienne środowiskowe są ustawione
 - Sprawdź, czy port jest dostępny
 
@@ -250,5 +261,6 @@ docker run -d \
 ## Wsparcie
 
 W razie problemów sprawdź:
+- [Dokumentacja Railway](https://docs.railway.com)
 - [Dokumentacja Hostingera](https://www.hostinger.pl/pomoc)
 - [Dokumentacja Next.js](https://nextjs.org/docs)

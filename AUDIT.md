@@ -14,7 +14,7 @@ zależności nie oznacza braku błędów aplikacji.
 | Średni | API czytało cały JSON przed sprawdzeniem rozmiaru; limity pól nie ograniczały pamięci zużytej podczas parsowania. | Limit rzeczywistych bajtów strumienia: 40 000, odpowiedź 413; walidacja przed wywołaniem usług zewnętrznych. |
 | Średni | Weryfikacja CAPTCHA była poza obsługą błędów, bez timeoutu, a sekret był w URL. | Timeout, POST body, kontrolowane błędy 502 i zamknięta ścieżka wysyłki przy nieudanej weryfikacji. |
 | Średni | Nieudana wysyłka pozostawiała zużyty token CAPTCHA w formularzu. | Reset po każdej próbie wysyłki do API. |
-| Średni | Brak limitu częstotliwości `/api/contact`. | Limit 30 żądań na minutę na proces, odpowiedź 429 z `Retry-After`, liczony przed CAPTCHA i bez ufania nagłówkom IP. Odbiór body przerywany po 10 s (408). Reguły Nginx dla limitu współdzielonego: `deploy/`. |
+| Średni | Brak limitu częstotliwości `/api/contact`. | Limit 30 żądań na minutę na proces, odpowiedź 429 z `Retry-After`, liczony przed CAPTCHA i bez ufania nagłówkom IP. Odbiór body przerywany po 10 s (408). Reguły Nginx dla limitu współdzielonego przygotowane w `deploy/`, niewdrożone — produkcja nie ma własnego proxy. |
 | Średni | Kilka okien Sapera używało tych samych identyfikatorów DOM — drugie okno sterowało pierwszym. | Canvas i statusy wyszukiwane w obrębie własnego okna przez atrybuty `data-*`. |
 | Średni, dostępność | Zamknięte menu mobilne zostawiało linki w nawigacji klawiaturą. | `inert` i `aria-hidden` po zamknięciu, `aria-expanded`/`aria-controls` na przycisku, pułapka fokusu, Escape zamyka i zwraca fokus. |
 | Średni | Brak CI i testów; `npm test` był placeholderem. | CI: instalacja z lockfile, audyt zależności, lint, typy, 20 testów API i build; patch/minor auto-merge po sukcesie i zgodności SHA. |
@@ -27,11 +27,12 @@ zależności nie oznacza braku błędów aplikacji.
 
 ## Pozostałe problemy
 
-1. **Limit żądań w aplikacji jest lokalny dla procesu.** Resetuje się przy
-   restarcie i nie jest wspólny dla kilku instancji. Globalny limit daje dopiero
-   wdrożenie `deploy/nginx-contact.conf` i `deploy/nginx-contact-location.conf`
-   na serwerze; pliki w repo nie są wdrożeniem. Port 3000 musi być wtedy
-   dostępny wyłącznie lokalnie, inaczej limit proxy da się ominąć.
+1. **Limit żądań działa tylko w aplikacji.** Produkcja stoi na Railway, gdzie
+   nie ma warstwy proxy pod naszą kontrolą, a licznik jest lokalny dla procesu:
+   resetuje się przy restarcie i nie obejmuje pozostałych instancji. Limit
+   wspólny wymaga włączenia proxy Cloudflare z regułą na `/api/contact` albo
+   migracji za własny reverse proxy — reguły Nginx czekają w `deploy/`.
+   Decyzja właściciela: zostajemy przy limicie aplikacyjnym.
 2. **Smoke test przeglądarkowy nie działa w CI.** `tests/ui_smoke.py` wymaga
    Pythona, przeglądarki Playwright i uruchomionego serwera na porcie 3100;
    uruchamiany ręcznie przed wdrożeniem.
@@ -49,6 +50,8 @@ tej podstawie XSS. Nie znaleziono śledzonych plików konfiguracji środowiska,
   zakresy wersji z tego PR-a przeniesione do wyczyszczonego manifestu.
   `npm ci` i `npm audit --audit-level=low`: 0 podatności. Po pushu CI na main
   zaliczone, lista alertów Dependabota pusta.
+- Produkcja: Railway z wdrożeniem po pushu na `main`, DNS na Cloudflare
+  w trybie DNS only. Po wdrożeniu `robots.txt` i `sitemap.xml` odpowiadają 200.
 - Dependabot: npm i GitHub Actions, poniedziałek 07:00 Europe/Warsaw.
   Majory wymagają ręcznego przeglądu. Automatyczne security fixes nie były włączane.
 - Resend: `RESEND_API_KEY`, `RESEND_FROM`, `MAIL_TO`; Google nadal odpowiada za CAPTCHA.
