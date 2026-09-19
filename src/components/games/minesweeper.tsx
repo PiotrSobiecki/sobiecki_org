@@ -5,6 +5,8 @@ export function Minesweeper() {
   useEffect(() => {
     const script = document.createElement("script");
     script.innerHTML = `
+      (() => {
+      const windows = new Map();
       function openMinesweeper() {
         const gameWindow = document.createElement("div");
         gameWindow.classList.add("window");
@@ -12,11 +14,11 @@ export function Minesweeper() {
         gameWindow.innerHTML = \`
           <div class="window-header">
             Minesweeper
-            <button class="button" onclick="closeMinesweeperWindow(this.parentElement.parentElement)">X</button>
+            <button class="button" aria-label="Zamknij Sapera">X</button>
           </div>
           <div class="window-content" style="position: relative;">
-            <canvas id="minesweeperCanvas" width="240" height="240"></canvas>
-            <div id="gameStatus" style="
+            <canvas data-minesweeper-canvas width="240" height="240"></canvas>
+            <div data-game-status style="
                 text-align: center; 
                 font-size: 20px; 
                 color: red; 
@@ -32,7 +34,7 @@ export function Minesweeper() {
                 display: none;">
             Game Over!
             </div>
-            <div id="winStatus" style="
+            <div data-win-status style="
                 text-align: center; 
                 font-size: 20px; 
                 color: green; 
@@ -52,44 +54,49 @@ export function Minesweeper() {
         \`;
       
         document.body.appendChild(gameWindow);
-        makeWindowDraggable(gameWindow);
+        const controller = new AbortController();
+        windows.set(gameWindow, controller);
+        gameWindow.querySelector("button").addEventListener("click", () => closeMinesweeperWindow(gameWindow), { signal: controller.signal });
+        makeWindowDraggable(gameWindow, controller.signal);
         gameWindow.style.display = "block";
-        startMinesweeper();
+        startMinesweeper(gameWindow, controller.signal);
       }
       
       function closeMinesweeperWindow(window) {
-        window.style.display = "none";
+        windows.get(window)?.abort();
+        windows.delete(window);
         window.remove();
       }
       
-      function makeWindowDraggable(win) {
+      function makeWindowDraggable(win, signal) {
         let isDragging = false;
         let offsetX, offsetY;
       
         const header = win.querySelector(".window-header");
       
         header.addEventListener("mousedown", (e) => {
+          if (e.target.closest("button")) return;
           isDragging = true;
           offsetX = e.clientX - win.getBoundingClientRect().left;
           offsetY = e.clientY - win.getBoundingClientRect().top;
           win.style.zIndex = 1000;
           e.preventDefault();
-        });
+        }, { signal });
       
         document.addEventListener("mousemove", (e) => {
           if (isDragging) {
             win.style.left = \`\${e.clientX - offsetX}px\`;
             win.style.top = \`\${e.clientY - offsetY}px\`;
           }
-        });
+        }, { signal });
       
         document.addEventListener("mouseup", () => {
           isDragging = false;
-        });
+        }, { signal });
       }
       
-      function startMinesweeper() {
-        const canvas = document.getElementById("minesweeperCanvas");
+      function startMinesweeper(gameWindow, signal) {
+        const canvas = gameWindow.querySelector("[data-minesweeper-canvas]");
         const ctx = canvas.getContext("2d");
         const rows = 12;
         const cols = 12;
@@ -191,7 +198,7 @@ export function Minesweeper() {
       
           if (board[row][col].mine) {
             gameOver = true;
-            document.getElementById("gameStatus").style.display = "block";
+            gameWindow.querySelector("[data-game-status]").style.display = "block";
             drawBoard();
             return;
           }
@@ -220,11 +227,12 @@ export function Minesweeper() {
       
           if (nonMineCellsRevealed === rows * cols - mineCount) {
             gameOver = true;
-            document.getElementById("winStatus").style.display = "block";
+            gameWindow.querySelector("[data-win-status]").style.display = "block";
           }
         }
       
         function flagCell(row, col) {
+          if (row < 0 || row >= rows || col < 0 || col >= cols) return;
           if (!board[row][col].revealed && !gameOver) {
             board[row][col].flagged = !board[row][col].flagged;
             drawBoard();
@@ -238,7 +246,7 @@ export function Minesweeper() {
           const col = Math.floor(x / cellSize);
           const row = Math.floor(y / cellSize);
           revealCell(row, col);
-        });
+        }, { signal });
       
         canvas.addEventListener("contextmenu", (event) => {
           event.preventDefault();
@@ -248,17 +256,25 @@ export function Minesweeper() {
           const col = Math.floor(x / cellSize);
           const row = Math.floor(y / cellSize);
           flagCell(row, col);
-        });
+        }, { signal });
       
         placeMines();
         initializeBoard();
         calculateAdjacentMines();
         drawBoard();
       }
+      window.openMinesweeper = openMinesweeper;
+      window.cleanupMinesweeper = () => {
+        for (const win of windows.keys()) closeMinesweeperWindow(win);
+        delete window.openMinesweeper;
+        delete window.cleanupMinesweeper;
+      };
+      })();
     `;
     document.body.appendChild(script);
 
     return () => {
+      (window as Window & { cleanupMinesweeper?: () => void }).cleanupMinesweeper?.();
       document.body.removeChild(script);
     };
   }, []);
