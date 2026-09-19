@@ -34,24 +34,21 @@ export default function Home() {
       description:
         "Tworzenie nowoczesnych aplikacji i stron internetowych dopasowanych do indywidualnych potrzeb.",
       category: "Development",
-      accentImage:
-        "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&q=80",
+      accentImage: "/images/uslugi-web.jpg",
     },
     {
       title: "Blockchain",
       description:
         "Analiza danych blockchain – przetwarzanie logów, generowanie statystyk i monitorowanie aktywności.",
       category: "Analytics",
-      accentImage:
-        "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&q=80",
+      accentImage: "/images/uslugi-blockchain.jpg",
     },
     {
       title: "Boty",
       description:
         "Budowa botów do monitorowania i powiadamiania o wybranych zdarzeniach on-chain.",
       category: "Automation",
-      accentImage:
-        "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80",
+      accentImage: "/images/uslugi-boty.jpg",
     },
   ];
 

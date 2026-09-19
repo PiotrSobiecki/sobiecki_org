@@ -13,6 +13,14 @@ with sync_playwright() as p:
     """)
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
+    # Nasze obrazy i wideo hostujemy u siebie. gstatic zostaje: to logo i font
+    # samego widgetu reCAPTCHA, ktorych nie da sie przejac bez zepsucia go.
+    allowed = ("127.0.0.1:3100", "gstatic.com")
+    foreign = []
+    page.on("request", lambda req: foreign.append(req.url)
+            if req.resource_type in ("image", "media", "font")
+            and not any(host in req.url for host in allowed)
+            else None)
     page.goto("http://127.0.0.1:3100", wait_until="networkidle")
     page.locator("#projekty").scroll_into_view_if_needed()
     card = page.locator("article").filter(has=page.get_by_role("heading", name="HomeCashflow", exact=True))
@@ -27,6 +35,13 @@ with sync_playwright() as p:
     assert robots.status == 200 and "Sitemap: https://sobiecki.org/sitemap.xml" in robots.text()
     sitemap = page.request.get("http://127.0.0.1:3100/sitemap.xml")
     assert sitemap.status == 200 and "https://sobiecki.org/polityka-prywatnosci" in sitemap.text()
+    page.locator("#uslugi").scroll_into_view_if_needed()
+    accents = page.locator(".service-card__accent")
+    expect(accents).to_have_count(3)
+    for i, name in enumerate(["uslugi-web", "uslugi-blockchain", "uslugi-boty"]):
+        assert f"/images/{name}.jpg" in accents.nth(i).evaluate("e => e.style.backgroundImage")
+        assert page.request.get(f"http://127.0.0.1:3100/images/{name}.jpg").status == 200
+    assert not foreign, foreign
     page.locator("#kontakt").scroll_into_view_if_needed()
     page.locator("#name").fill("Jan Testowy")
     page.locator("#email").fill("it@sobiecki.org")
@@ -70,5 +85,5 @@ with sync_playwright() as p:
     expect(page.locator("[data-minesweeper-canvas]")).to_have_count(0)
     assert page.evaluate("gameSignals.every(s => s.aborted)")
     assert not errors, errors
-    print("PASS: project content, SEO, CAPTCHA guard, independent games and listener cleanup, keyboard menu, no browser errors")
+    print("PASS: project content, SEO, CAPTCHA guard, independent games and listener cleanup, keyboard menu, local images, no browser errors")
     browser.close()
