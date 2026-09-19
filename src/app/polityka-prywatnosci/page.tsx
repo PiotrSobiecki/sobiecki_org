@@ -64,8 +64,10 @@ export default function PolitykaPrywatnosci() {
                 4. Przekazywanie danych
               </h2>
               <p className="text-white/70">
-                Dane nie są przekazywane podmiotom trzecim, z wyjątkiem
-                przypadków wymaganych przepisami prawa.
+                Do dostarczenia wiadomości z formularza korzystamy z Resend,
+                któremu przekazujemy imię i nazwisko, adres e-mail oraz treść
+                wiadomości. Google reCAPTCHA służy do ochrony formularza przed
+                spamem i przetwarza dane związane z weryfikacją użytkownika.
               </p>
             </div>
             <div className="card">

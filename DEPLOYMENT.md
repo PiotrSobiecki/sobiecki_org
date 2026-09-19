@@ -6,12 +6,20 @@ Aplikacja wymaga następujących zmiennych środowiskowych:
 
 ```
 RECAPTCHA_SECRET_KEY=twoj_secret_key_reCAPTCHA
-SMTP_HOST=smtp.hostinger.com
-SMTP_PORT=465
-SMTP_USER=twoj_email@domena.pl
-SMTP_PASS=twoje_haslo_smtp
-MAIL_TO=twoj_email@domena.pl
+NEXT_PUBLIC_RECAPTCHA_SITE_KEY=publiczny_klucz_reCAPTCHA
+RESEND_API_KEY=klucz_z_uprawnieniem_do_wysylki
+RESEND_FROM=noreply@sobiecki.org
+MAIL_TO=it@sobiecki.org
 ```
+
+`RESEND_FROM` musi należeć do domeny zweryfikowanej w Resend. Adres osoby
+wypełniającej formularz trafia do `Reply-To`. Wysyłka korzysta z HTTPS API Resend;
+webhook nie jest wymagany. Google reCAPTCHA pozostaje ochroną antyspamową.
+Sekrety podaj w konfiguracji środowiska hostingu lub wstrzyknij przez `op run`.
+Nie dodawaj ich do repo ani obrazu Docker. Klucz publiczny reCAPTCHA musi być
+dostępny podczas budowania (`--build-arg NEXT_PUBLIC_RECAPTCHA_SITE_KEY=...`).
+
+Dokumentacja API: https://resend.com/docs/api-reference/emails/send-email
 
 ## Opcja 1: Hostinger VPS (Zalecane - Docker)
 
@@ -195,11 +203,12 @@ docker run -d \
 - Sprawdź, czy wszystkie zmienne środowiskowe są ustawione
 - Sprawdź, czy port jest dostępny
 
-### Błędy SMTP
+### Błędy Resend
 
-- Sprawdź dane SMTP w panelu Hostingera
-- Upewnij się, że używasz poprawnego portu (465 dla SSL)
-- Sprawdź, czy hasło SMTP jest poprawne
+- Sprawdź `RESEND_API_KEY`, `RESEND_FROM` i `MAIL_TO` w środowisku serwera.
+- Zweryfikuj domenę nadawcy w Resend i dostęp klucza do tej domeny.
+- Sprawdź status wiadomości w panelu Resend; odpowiedź API oznacza przyjęcie,
+  a nie potwierdzone doręczenie. Nie loguj klucza ani treści formularza.
 
 ### Błędy reCAPTCHA
 

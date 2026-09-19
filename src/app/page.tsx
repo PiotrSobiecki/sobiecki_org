@@ -63,10 +63,10 @@ export default function Home() {
       url: "https://oddajhajs.org",
     },
     {
-      name: "Signum Wallet",
+      name: "HomeCashflow",
       description:
-        "Portfel webowy obsługujący Arbitrum, Ethereum, Polygon i Base. Umożliwia zakładanie portfeli, przesyłanie tokenów i NFT oraz przeglądanie historii transakcji. Narzędzie ma pełną funkcjonalność, lecz służy głównie celom demonstracyjnym.",
-      url: "https://wallet.sobiecki.org",
+        "Aplikacja do zarządzania budżetem domowym i wspólnymi finansami. Pomaga kontrolować wydatki stałe i zmienne, planować oszczędności oraz śledzić miesięczne podsumowania i prognozy finansowe.",
+      url: "https://homecashflow.org",
     },
     {
       name: "MindWander",
@@ -142,12 +142,12 @@ export default function Home() {
 
       setSuccess("Wiadomość została wysłana!");
       form.reset();
-      recaptcha?.reset();
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Wystąpił nieoczekiwany błąd.",
       );
     } finally {
+      recaptcha?.reset();
       setLoading(false);
     }
   }
@@ -241,6 +241,7 @@ export default function Home() {
                   type="text"
                   id="name"
                   name="name"
+                  maxLength={200}
                   required
                   className="w-full px-4 py-2 bg-[#0a0a0a] border border-white/20 text-white focus:ring-2 focus:ring-white focus:border-white"
                 />
@@ -256,6 +257,7 @@ export default function Home() {
                   type="email"
                   id="email"
                   name="email"
+                  maxLength={320}
                   required
                   className="w-full px-4 py-2 bg-[#0a0a0a] border border-white/20 text-white focus:ring-2 focus:ring-white focus:border-white"
                 />
@@ -270,6 +272,7 @@ export default function Home() {
                 <textarea
                   id="message"
                   name="message"
+                  maxLength={5000}
                   rows={4}
                   required
                   className="w-full px-4 py-2 bg-[#0a0a0a] border border-white/20 text-white focus:ring-2 focus:ring-white focus:border-white"

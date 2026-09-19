@@ -1,43 +1,47 @@
 import { NextRequest, NextResponse } from "next/server";
-import nodemailer from "nodemailer";
 
 // Limity chronią przed nadużyciem formularza do wysyłki gigantycznych maili.
 const MAX_NAME = 200;
 const MAX_EMAIL = 320; // maks. długość adresu e-mail wg RFC 5321
 const MAX_MESSAGE = 5000;
+const MAX_BODY_BYTES = 40_000;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(req: NextRequest) {
+  const reader = req.body?.getReader();
+  if (!reader) return NextResponse.json({ error: "Nieprawidłowe żądanie." }, { status: 400 });
   let body: unknown;
   try {
-    body = await req.json();
+    const chunks: Uint8Array[] = [];
+    let size = 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > MAX_BODY_BYTES) {
+        await reader.cancel();
+        return NextResponse.json({ error: "Przekroczono dozwolony rozmiar żądania." }, { status: 413 });
+      }
+      chunks.push(value);
+    }
+    body = JSON.parse(Buffer.concat(chunks).toString("utf8"));
   } catch {
     return NextResponse.json(
       { error: "Nieprawidłowe żądanie." },
       { status: 400 }
     );
+  } finally {
+    reader.releaseLock();
+  }
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return NextResponse.json({ error: "Nieprawidłowe żądanie." }, { status: 400 });
   }
 
-  const { name, email, message, token } = (body ?? {}) as Record<
+  const { name, email, message, token } = body as Record<
     string,
     unknown
   >;
-
-  // Walidacja reCAPTCHA
-  const recaptchaRes = await fetch(
-    `https://www.google.com/recaptcha/api/siteverify?secret=${encodeURIComponent(
-      process.env.RECAPTCHA_SECRET_KEY ?? ""
-    )}&response=${encodeURIComponent(typeof token === "string" ? token : "")}`,
-    { method: "POST" }
-  );
-  const recaptchaData = await recaptchaRes.json();
-  if (!recaptchaData.success) {
-    return NextResponse.json(
-      { error: "Błąd weryfikacji reCAPTCHA." },
-      { status: 400 }
-    );
-  }
 
   // Walidacja pól
   if (
@@ -65,37 +69,60 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (!EMAIL_RE.test(email)) {
+  if (!EMAIL_RE.test(email) || /[\r\n]/.test(name)) {
     return NextResponse.json(
       { error: "Nieprawidłowy adres e-mail." },
       { status: 400 }
     );
   }
 
-  // Konfiguracja nodemailer
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT),
-    secure: true,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
+  if (typeof token !== "string" || !token.trim() || token.length > 8192) {
+    return NextResponse.json({ error: "Potwierdź, że nie jesteś robotem." }, { status: 400 });
+  }
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.RESEND_FROM;
+  const to = process.env.MAIL_TO;
+  const captchaSecret = process.env.RECAPTCHA_SECRET_KEY;
+  if (!apiKey || !from || !to || !captchaSecret) {
+    return NextResponse.json({ error: "Formularz jest chwilowo niedostępny." }, { status: 503 });
+  }
 
   try {
-    await transporter.sendMail({
-      from: process.env.SMTP_USER,
-      to: process.env.MAIL_TO,
-      subject: `Nowa wiadomość z formularza kontaktowego od ${name}`,
-      replyTo: email,
-      text: `Imię i nazwisko: ${name}\nEmail: ${email}\n\nWiadomość:\n${message}`,
+    const recaptchaRes = await fetch("https://www.google.com/recaptcha/api/siteverify", {
+      method: "POST",
+      body: new URLSearchParams({ secret: captchaSecret, response: token }),
+      signal: AbortSignal.timeout(10_000),
     });
+    if (!recaptchaRes.ok) throw new Error("Verification unavailable");
+    const recaptchaData = await recaptchaRes.json();
+    if (recaptchaData?.success !== true) {
+      return NextResponse.json({ error: "Błąd weryfikacji reCAPTCHA." }, { status: 400 });
+    }
+  } catch {
+    return NextResponse.json({ error: "Weryfikacja jest chwilowo niedostępna." }, { status: 502 });
+  }
+
+  try {
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      signal: AbortSignal.timeout(15_000),
+      body: JSON.stringify({
+        from,
+        to: [to],
+        subject: `Nowa wiadomość z formularza kontaktowego od ${name}`,
+        reply_to: email,
+        text: `Imię i nazwisko: ${name}\nEmail: ${email}\n\nWiadomość:\n${message}`,
+      }),
+    });
+    if (!response.ok) throw new Error("Email provider rejected request");
+    const result = await response.json();
+    if (typeof result?.id !== "string" || !result.id) throw new Error("Invalid provider response");
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json(
       { error: "Nie udało się wysłać wiadomości." },
-      { status: 500 }
+      { status: 502 }
     );
   }
 }

@@ -1,3 +1,12 @@
 node_modules
-
-.dockerignore 
+.next
+.git
+.claude
+.codex
+.agents
+.env
+.env.*
+*.pem
+*.key
+*.tsbuildinfo
+npm-debug.log*

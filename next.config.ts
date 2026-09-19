@@ -1,10 +1,9 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
   reactStrictMode: true,
   output: "standalone",
-  webpack: (config: any) => {
-    return config;
-  },
+  outputFileTracingRoot: process.cwd(),
 };
 
-module.exports = nextConfig;
+export default nextConfig;

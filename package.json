@@ -181,7 +181,6 @@
     "natural-compare": "^1.4.0",
     "next": "^15.3.8",
     "node-releases": "^2.0.19",
-    "nodemailer": "^9.0.3",
     "normalize-range": "^0.1.2",
     "object-assign": "^4.1.1",
     "object-inspect": "^1.13.4",
@@ -283,10 +282,12 @@
     "yocto-queue": "^0.1.0"
   },
   "scripts": {
+    "lint": "eslint src next.config.ts --max-warnings 0",
+    "typecheck": "tsc --noEmit --incremental false",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test tests/*.test.cjs"
   },
   "repository": {
     "type": "git",
@@ -302,7 +303,6 @@
   "description": "",
   "devDependencies": {
     "@types/node": "^22.15.18",
-    "@types/nodemailer": "^6.4.17",
     "@types/react": "^19.1.4",
     "@types/react-dom": "^19.1.5",
     "@types/react-google-recaptcha": "^2.1.9",
