@@ -13,6 +13,10 @@ with sync_playwright() as p:
     """)
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
+    # CSP nie zglasza sie przez pageerror - blokada widac tylko w konsoli.
+    csp_blocks = []
+    page.on("console", lambda msg: csp_blocks.append(msg.text)
+            if "Content Security Policy" in msg.text else None)
     # Nasze obrazy i wideo hostujemy u siebie. gstatic zostaje: to logo i font
     # samego widgetu reCAPTCHA, ktorych nie da sie przejac bez zepsucia go.
     allowed = ("127.0.0.1:3100", "gstatic.com")
@@ -96,6 +100,12 @@ with sync_playwright() as p:
     expect(page.locator('link[rel="canonical"]')).to_have_attribute("href", "https://sobiecki.org/polityka-prywatnosci")
     expect(page.locator("[data-minesweeper-canvas]")).to_have_count(0)
     assert page.evaluate("gameSignals.every(s => s.aborted)")
+    assert not csp_blocks, csp_blocks
+    headers = page.request.get("http://127.0.0.1:3100/").headers
+    for key in ("content-security-policy", "strict-transport-security", "x-content-type-options",
+                "x-frame-options", "referrer-policy", "permissions-policy"):
+        assert key in headers, key
+    assert "frame-ancestors 'none'" in headers["content-security-policy"]
     assert not errors, errors
     print("PASS: project content, SEO, CAPTCHA guard, independent games and listener cleanup, keyboard menu, local images, no browser errors")
     browser.close()
