@@ -49,11 +49,11 @@ zależności nie oznacza braku błędów aplikacji.
    Next.js: statycznie renderowany HTML niesie osiem skryptów inline z ładunkiem
    hydracji. Zamknięcie wymaga nonce'ów z middleware, czyli renderowania
    dynamicznego — strona straciłaby prerender i cache na brzegu Railway.
-   Pozostałe dyrektywy i tak odcinają obce źródła, a na stronie nie ma treści
-   pochodzących od użytkownika, które mogłyby wrócić do HTML-a.
+   Pozostałe dyrektywy i tak odcinają obce źródła.
 
-Statyczne `innerHTML` Sapera nie zawiera danych użytkownika; nie stwierdzono na
-tej podstawie XSS. Nie znaleziono śledzonych plików konfiguracji środowiska,
+Nie znaleziono ścieżki, którą dane użytkownika wracałyby do HTML-a — formularz
+kontaktowy ich nie odtwarza, a Saper przestał korzystać z `innerHTML`. Nie
+stwierdzono na tej podstawie XSS. Nie znaleziono śledzonych plików konfiguracji środowiska,
 `.pem` ani `.key` w wykonanym sprawdzeniu nazw plików.
 
 ## Konfiguracja i weryfikacja
