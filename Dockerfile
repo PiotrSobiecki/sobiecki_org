@@ -1,5 +1,5 @@
-# Użyj obrazu Node.js 20 jako bazowego
-FROM node:20-alpine AS base
+# Ta sama wersja Node.js co w CI.
+FROM node:22-alpine AS base
 
 # Etap instalacji zależności
 FROM base AS deps
