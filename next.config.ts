@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
-// 'unsafe-inline' w script-src zostaje, dopóki Saper wstrzykuje swój kod
-// przez script.innerHTML, a Next.js własny bootstrap. Reszta dyrektyw i tak
-// odcina obce źródła.
+// 'unsafe-inline' w script-src zostaje przez bootstrap hydracji Next.js:
+// statyczny HTML niesie skrypty inline, a nonce wymaga middleware, czyli
+// renderowania dynamicznego. Reszta dyrektyw i tak odcina obce źródła.
 const contentSecurityPolicy = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com",

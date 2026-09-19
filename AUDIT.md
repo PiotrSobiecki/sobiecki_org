@@ -41,22 +41,16 @@ zależności nie oznacza braku błędów aplikacji.
    migracji za własny reverse proxy — reguły Nginx czekają w `deploy/`.
    Decyzja właściciela: zostajemy przy limicie aplikacyjnym.
 2. **Smoke test przeglądarkowy nie działa w CI.** `tests/ui_smoke.py` wymaga
-   Pythona, przeglądarki Playwright i uruchomionego serwera na porcie 3100;
-   uruchamiany ręcznie przed wdrożeniem.
-3. **Indeksowanie wymaga dostępu do konta Google.** Weryfikacja własności
-   `sobiecki.org` i zgłoszenie mapy witryny w Search Console pozostają po
-   stronie właściciela. Mapa nie gwarantuje indeksacji ani pozycji.
-4. **CSP dopuszcza `'unsafe-inline'` w `script-src`.** Powodem jest już tylko
+   Pythona, przeglądarki Playwright i uruchomionego serwera na porcie 3100.
+   Decyzja właściciela: zostaje uruchamiany ręcznie przed wdrożeniem.
+3. **CSP dopuszcza `'unsafe-inline'` w `script-src`.** Powodem jest już tylko
    Next.js: statycznie renderowany HTML niesie osiem skryptów inline z ładunkiem
    hydracji. Zamknięcie wymaga nonce'ów z middleware, czyli renderowania
    dynamicznego — strona straciłaby prerender i cache na brzegu Railway.
-   Pozostałe dyrektywy i tak odcinają obce źródła.
-
-5. **Nic nie broni gałęzi `main` przed czerwonym CI.** Workflow `verify` biegnie
-   na każdym PR-ze i pushu, a auto-merge Dependabota siedzi za nim i pomija
-   majory, ale GitHub nie wymaga zielonego statusu do ręcznego merge'a — tą
-   drogą wszedł PR #4. Zamknięcie: reguła ochrony gałęzi z wymaganym statusem
-   `verify`. Decyzja właściciela repozytorium.
+   W kodzie nie ma `innerHTML` ani `dangerouslySetInnerHTML`, a `base-uri`,
+   `object-src`, `form-action` i `frame-ancestors` zamykają typowe ścieżki
+   eskalacji, więc bez punktu wstrzyknięcia HTML-a dyrektywa nie ma na czym
+   zadziałać.
 
 Nie znaleziono ścieżki, którą dane użytkownika wracałyby do HTML-a — formularz
 kontaktowy ich nie odtwarza, a Saper przestał korzystać z `innerHTML`. Nie
@@ -71,6 +65,12 @@ stwierdzono na tej podstawie XSS. Nie znaleziono śledzonych plików konfiguracj
   zaliczone, lista alertów Dependabota pusta.
 - Produkcja: Railway z wdrożeniem po pushu na `main`, DNS na Cloudflare
   w trybie DNS only. Po wdrożeniu `robots.txt` i `sitemap.xml` odpowiadają 200.
+- Ochrona `main`: ruleset „main wymaga zielonego verify" — PR przed merge'em,
+  wymagany status `verify`, bez force-pusha i usuwania gałęzi. Rola admina ma
+  obejście, więc push właściciela wprost na `main` dalej działa; to samo obejście
+  pozwoliłoby ponownie wmergować czerwony PR.
+- Search Console: właściciel potwierdził weryfikację domeny i zgłoszenie mapy
+  witryny. Nie sprawdzane z naszej strony.
 - Dependabot: npm i GitHub Actions, poniedziałek 07:00 Europe/Warsaw.
   Majory wymagają ręcznego przeglądu. Automatyczne security fixes nie były włączane.
 - Resend: `RESEND_API_KEY`, `RESEND_FROM`, `MAIL_TO`; Google nadal odpowiada za CAPTCHA.
