@@ -12,7 +12,7 @@ export function Footer() {
   const TILE_LINKS = [
     { label: "usługi", href: "/#uslugi" },
     { label: "przykładowe projekty", href: "/#projekty" },
-    { label: "kontakt", href: "#kontakt" },
+    { label: "kontakt", href: "/#kontakt" },
     { label: "polityka prywatności", href: "/polityka-prywatnosci" },
   ];
 

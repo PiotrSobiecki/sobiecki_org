@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AccessibilityWidget } from "@/components/ui/accessibility";
@@ -6,9 +6,26 @@ import { AccessibilityWidget } from "@/components/ui/accessibility";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Piotr Sobiecki - Profesjonalne Usługi Informatyczne",
+  metadataBase: new URL("https://sobiecki.org"),
+  title: {
+    default: "Piotr Sobiecki — tworzenie stron i aplikacji webowych",
+    template: "%s | Piotr Sobiecki",
+  },
   description:
-    " - tworzenie aplikacji webowych, analiza danych blockchain, budowa botów i doradztwo IT",
+    "Tworzę strony i aplikacje webowe, boty monitorujące oraz rozwiązania do analizy danych blockchain. Poznaj moje projekty i skontaktuj się w sprawie współpracy.",
+  alternates: { canonical: "/" },
+  authors: [{ name: "Piotr Sobiecki", url: "https://sobiecki.org" }],
+  robots: { index: true, follow: true },
+  openGraph: {
+    type: "website",
+    locale: "pl_PL",
+    url: "https://sobiecki.org",
+    siteName: "Piotr Sobiecki — Usługi Informatyczne",
+    title: "Piotr Sobiecki — tworzenie stron i aplikacji webowych",
+    description: "Strony i aplikacje webowe, analiza blockchain i boty monitorujące. Sprawdź projekty i porozmawiajmy o współpracy.",
+    images: [{ url: "/images/cover.png", alt: "Piotr Sobiecki — Usługi Informatyczne" }],
+  },
+  twitter: { card: "summary_large_image" },
   icons: {
     icon: [
       { url: "/icon.png", type: "image/png" },
@@ -18,6 +35,8 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = { themeColor: "#8B5CF6" };
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -25,35 +44,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pl">
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="theme-color" content="#8B5CF6" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <link rel="icon" href="/icon.png" type="image/png" />
-        <link rel="shortcut icon" href="/icon.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/icon.png" />
-        <meta
-          name="description"
-          content="Profesjonalne usługi informatyczne - tworzenie aplikacji webowych, analiza danych blockchain, budowa botów i doradztwo IT."
-        />
-        <meta
-          name="keywords"
-          content="usługi informatyczne, aplikacje webowe, blockchain, boty, doradztwo IT"
-        />
-        <meta name="author" content="Piotr Sobiecki" />
-        <meta
-          property="og:title"
-          content="Piotr Sobiecki - Profesjonalne Usługi Informatyczne"
-        />
-        <meta
-          property="og:description"
-          content="Profesjonalne usługi informatyczne - tworzenie aplikacji webowych, analiza danych blockchain, budowa botów i doradztwo IT."
-        />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://sobiecki.org" />
-        <meta property="og:image" content="/images/og-image.png" />
-      </head>
       <body className={inter.className}>
         {children}
         <AccessibilityWidget />

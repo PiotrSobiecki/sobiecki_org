@@ -42,6 +42,17 @@ adresów. Port aplikacji 3000 powinien być dostępny tylko lokalnie, np. Docker
 Po dołączeniu plików uruchom `nginx -t` i dopiero wtedy przeładuj Nginx.
 Pliki w repo nie oznaczają, że reguły są już wdrożone na serwerze.
 
+## Indeksowanie w Google
+
+Strona generuje `/robots.txt` i `/sitemap.xml`, adresy kanoniczne oraz metadane
+dla strony głównej i polityki prywatności. Mapa jest wskazana w `robots.txt`.
+Po wdrożeniu sprawdź odpowiedzi 200 dla obu plików, zweryfikuj usługę
+`sobiecki.org` w Google Search Console i zgłoś
+`https://sobiecki.org/sitemap.xml` w sekcji Mapy witryn. Następnie sprawdź URL
+strony głównej i poproś o indeksowanie, jeśli Google jeszcze go nie zna.
+Weryfikacja własności i zgłoszenie w Search Console wymagają dostępu do konta.
+Sitemap pomaga wykrywać strony, ale nie gwarantuje indeksacji ani pozycji.
+
 ## Opcja 1: Hostinger VPS (Zalecane - Docker)
 
 Jeśli masz VPS na Hostingerze, możesz użyć Dockera:

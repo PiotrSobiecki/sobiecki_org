@@ -1,6 +1,17 @@
-"use client";
+import type { Metadata } from "next";
 import { Navbar } from "@/components/ui/navbar";
 import { Footer } from "@/components/ui/footer";
+
+export const metadata: Metadata = {
+  title: "Polityka prywatności",
+  description: "Zasady przetwarzania danych z formularza kontaktowego, ochrona prywatności i kontakt z administratorem serwisu sobiecki.org.",
+  alternates: { canonical: "/polityka-prywatnosci" },
+  openGraph: {
+    title: "Polityka prywatności | Piotr Sobiecki",
+    description: "Zasady przetwarzania danych i ochrony prywatności w serwisie sobiecki.org.",
+    url: "https://sobiecki.org/polityka-prywatnosci",
+  },
+};
 
 export default function PolitykaPrywatnosci() {
   return (
