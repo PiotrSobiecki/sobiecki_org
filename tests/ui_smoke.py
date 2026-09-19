@@ -22,7 +22,19 @@ with sync_playwright() as p:
             and not any(host in req.url for host in allowed)
             else None)
     page.goto("http://127.0.0.1:3100", wait_until="networkidle")
+
+    # Tlo hero ma plakat, a tlo sekcji projektow nie pobiera sie przed kadrem.
+    hero_video = page.locator("section.hero video")
+    expect(hero_video).to_have_attribute("preload", "none")
+    expect(hero_video).to_have_attribute("poster", "/images/coding-poster.jpg")
+    section_video = page.locator("video.section-bg-video")
+    expect(section_video).to_have_attribute("poster", "/images/kafelek-poster.jpg")
+    assert section_video.evaluate("v => v.getAttribute('src') === null")
+
     page.locator("#projekty").scroll_into_view_if_needed()
+    page.wait_for_function(
+        "() => document.querySelector('video.section-bg-video')?.src.endsWith('/images/kafelek.mp4')"
+    )
     card = page.locator("article").filter(has=page.get_by_role("heading", name="HomeCashflow", exact=True))
     expect(card).to_be_visible()
     expect(card.get_by_role("link")).to_have_attribute("href", "https://homecashflow.org")
@@ -30,7 +42,7 @@ with sync_playwright() as p:
     expect(page.get_by_text("Signum Wallet", exact=True)).to_have_count(0)
     expect(page.locator('link[rel="canonical"]')).to_have_attribute("href", "https://sobiecki.org")
     expect(page.locator('meta[name="description"]')).to_have_count(1)
-    expect(page.locator('meta[property="og:image"]')).to_have_attribute("content", "https://sobiecki.org/images/cover.png")
+    expect(page.locator('meta[property="og:image"]')).to_have_attribute("content", "https://sobiecki.org/images/og-cover.jpg")
     robots = page.request.get("http://127.0.0.1:3100/robots.txt")
     assert robots.status == 200 and "Sitemap: https://sobiecki.org/sitemap.xml" in robots.text()
     sitemap = page.request.get("http://127.0.0.1:3100/sitemap.xml")

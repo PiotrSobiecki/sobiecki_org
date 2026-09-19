@@ -55,7 +55,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
         marginLeft: `${leftOffset}px`,
         marginBottom: "100px",
         transformOrigin: "center top",
-        backgroundImage: `url(/images/cover.png)`,
+        backgroundImage: `url(/images/cover.jpg)`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         ...delayStyle,

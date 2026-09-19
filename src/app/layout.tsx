@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     siteName: "Piotr Sobiecki — Usługi Informatyczne",
     title: "Piotr Sobiecki — tworzenie stron i aplikacji webowych",
     description: "Strony i aplikacje webowe, analiza blockchain i boty monitorujące. Sprawdź projekty i porozmawiajmy o współpracy.",
-    images: [{ url: "/images/cover.png", alt: "Piotr Sobiecki — Usługi Informatyczne" }],
+    images: [{ url: "/images/og-cover.jpg", width: 1200, height: 630, alt: "Piotr Sobiecki — tworzenie stron i aplikacji webowych" }],
   },
   twitter: { card: "summary_large_image" },
   icons: {

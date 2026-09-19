@@ -5,6 +5,7 @@ import { Footer } from "@/components/ui/footer";
 import { ProjectCard } from "@/components/ui/project-card";
 import { ServiceCard } from "@/components/ui/service-card";
 import { BinaryBackground } from "@/components/ui/binary-background";
+import { BackgroundVideo } from "@/components/ui/background-video";
 import { useRef, useState, useMemo } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import useRevealOnIntersect from "@/hooks/useRevealOnIntersect";
@@ -186,9 +187,11 @@ export default function Home() {
         className="projects section-with-video"
         ref={projectsRef}
       >
-        <video className="section-bg-video" autoPlay muted loop playsInline>
-          <source src="/images/kafelek.mp4" type="video/mp4" />
-        </video>
+        <BackgroundVideo
+          className="section-bg-video"
+          src="/images/kafelek.mp4"
+          poster="/images/kafelek-poster.jpg"
+        />
         <div className="container">
           <div className="section-header" style={sectionHeaderStyle}>
             <p className="eyebrow">projekty</p>

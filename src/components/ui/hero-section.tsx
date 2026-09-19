@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { ArrowRight, Code, Database, Bot, Mail } from "lucide-react";
 import useRevealOnIntersect from "@/hooks/useRevealOnIntersect";
+import { BackgroundVideo } from "@/components/ui/background-video";
 
 const CHARS = "01";
 
@@ -131,23 +132,17 @@ export function HeroSection() {
     };
   }, []);
 
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   return (
     <section className="hero" ref={heroRef}>
       {/* Background Video - Full Section */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <video
-          ref={videoRef}
+        <BackgroundVideo
+          src="/images/coding.mp4"
+          poster="/images/coding-poster.jpg"
           className="absolute inset-0 w-full h-full object-cover"
-          autoPlay
-          muted
-          loop
-          playsInline
           style={{ opacity: 0.6, objectPosition: "center 40%" }}
-        >
-          <source src="/images/coding.mp4" type="video/mp4" />
-        </video>
+        />
         <div 
           className="absolute inset-0"
           style={{
