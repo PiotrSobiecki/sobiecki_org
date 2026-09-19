@@ -20,6 +20,15 @@ zależności nie oznacza braku błędów aplikacji.
 
 ## Pozostałe problemy
 
+**Pilne — alerty zależności z GitHuba po publikacji.** Po pushu GitHub zgłosił
+otwarte podatności mimo lokalnego wyniku `npm audit: 0`. Odczyt alertów potwierdził
+m.in. dwie krytyczne podatności Next.js (RCE; warunki zależne od funkcji/platformy).
+Lockfile zawiera Next.js 15.5.20; według alertów poprawki są w 15.5.24.
+Pozostałe zgłoszenia dotyczą m.in. sharp, js-yaml, browserslist, nanoid,
+brace-expansion i postcss. Nie naprawiono ich w commicie migracji Resend.
+Aktualny status: [alerty Dependabota](https://github.com/PiotrSobiecki/sobiecki_org/security/dependabot).
+Lokalny wynik audytu npm nie powinien być traktowany jako potwierdzenie braku podatności.
+
 1. **Średni — brak limitu częstotliwości `/api/contact`.** CAPTCHA chroni wysyłkę,
    lecz endpoint nadal przyjmuje nieograniczoną liczbę żądań. Ustawić limit na
    reverse proxy/WAF, razem z timeoutem odbioru body. Konfiguracja hostingu nie
@@ -49,7 +58,8 @@ commitów `.env` / `.env.local` w wykonanym sprawdzeniu nazw plików.
   Majory wymagają ręcznego przeglądu. Automatyczne security fixes nie były włączane.
 - Resend: `RESEND_API_KEY`, `RESEND_FROM`, `MAIL_TO`; Google nadal odpowiada za CAPTCHA.
 - Testy API izolują sieć: nie wysyłają wiadomości i nie potrzebują sekretów.
-- `npm audit`: 0 podatności w badanym stanie lockfile.
+- `npm audit`: lokalnie 0; GitHub później zgłosił podatności tego lockfile,
+  w tym krytyczne — patrz sekcja powyżej.
 - `npm run lint`, `npm run typecheck`, `npm test`: zaliczone (17 testów).
 - `npm run build`: zaliczony po migracji Resend.
 - Playwright: karta HomeCashflow i jej adres, brak Signum Wallet, wypełnienie
