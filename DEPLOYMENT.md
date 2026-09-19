@@ -21,6 +21,27 @@ dostępny podczas budowania (`--build-arg NEXT_PUBLIC_RECAPTCHA_SITE_KEY=...`).
 
 Dokumentacja API: https://resend.com/docs/api-reference/emails/send-email
 
+## Ochrona formularza przed nadmiarem żądań
+
+API ogranicza wszystkie próby do 30 na minutę na proces (odpowiedź 429 i
+`Retry-After`), bez polegania na nagłówkach IP dostarczonych przez klienta.
+Odbieranie body ma limit 10 sekund i 40 000 bajtów. Limit w aplikacji resetuje
+się przy restarcie; nie jest wspólny dla kilku instancji.
+
+Dla produkcyjnego Nginx przygotowane są dwa pliki:
+
+1. `deploy/nginx-contact.conf` — dołącz w kontekście `http {}`; tworzy współdzielone
+   strefy ograniczające ruch łącznie i per IP.
+2. `deploy/nginx-contact-location.conf` — dołącz wewnątrz istniejącego wirtualnego
+   hosta HTTPS `server {}`; kieruje formularz na `127.0.0.1:3000`.
+
+Dopasuj upstream do hostingu. Gdy Nginx jest za CDN/proxy, odtwarzaj prawdziwe IP
+wyłącznie z adresów tego zaufanego proxy. Nigdy nie ufaj nagłówkom IP ze wszystkich
+adresów. Port aplikacji 3000 powinien być dostępny tylko lokalnie, np. Docker
+`-p 127.0.0.1:3000:3000`, aby nie można było ominąć limitu proxy.
+Po dołączeniu plików uruchom `nginx -t` i dopiero wtedy przeładuj Nginx.
+Pliki w repo nie oznaczają, że reguły są już wdrożone na serwerze.
+
 ## Opcja 1: Hostinger VPS (Zalecane - Docker)
 
 Jeśli masz VPS na Hostingerze, możesz użyć Dockera:

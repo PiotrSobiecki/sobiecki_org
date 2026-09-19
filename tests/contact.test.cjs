@@ -9,14 +9,15 @@ const { NextRequest } = require('next/server');
 const compiled = ts.transpileModule(fs.readFileSync('src/app/api/contact/route.ts', 'utf8'), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
 }).outputText;
-const moduleExports = {};
-vm.runInThisContext('(function(require,exports){' + compiled + '\n})')(require, moduleExports);
-const { POST } = moduleExports;
+let POST;
 const originalFetch = global.fetch;
 const keys = ['RESEND_API_KEY', 'RESEND_FROM', 'MAIL_TO', 'RECAPTCHA_SECRET_KEY'];
 let previous;
 let calls;
 beforeEach(() => {
+  const moduleExports = {};
+  vm.runInThisContext('(function(require,exports){' + compiled + '\n})')(require, moduleExports);
+  POST = moduleExports.POST;
   previous = Object.fromEntries(keys.map(key => [key, process.env[key]]));
   Object.assign(process.env, { RESEND_API_KEY: 'test-only', RESEND_FROM: 'site@example.org', MAIL_TO: 'owner@example.org', RECAPTCHA_SECRET_KEY: 'test-secret' });
   calls = [];
@@ -24,6 +25,38 @@ beforeEach(() => {
     calls.push({ url, options });
     return Response.json(url.includes('recaptcha') ? { success: true } : { id: 'test-email-id' });
   };
+});
+
+test('request limiter rejects bursts before CAPTCHA and cannot be bypassed with spoofed IP headers', async () => {
+  for (let i = 0; i < 30; i++) {
+    assert.equal((await POST(request('{'))).status, 400);
+  }
+  const next = request(valid);
+  next.headers.set('x-forwarded-for', '203.0.113.77');
+  const response = await POST(next);
+  assert.equal(response.status, 429);
+  assert.ok(Number(response.headers.get('Retry-After')) > 0);
+  assert.equal(calls.length, 0);
+});
+
+test('request budget becomes available after the window expires', async t => {
+  let now = 60000;
+  t.mock.method(Date, 'now', () => now);
+  for (let i = 0; i < 30; i++) await POST(request('{'));
+  assert.equal((await POST(request('{'))).status, 429);
+  now += 60000;
+  assert.equal((await POST(request('{'))).status, 400);
+});
+
+test('slow request body is cancelled after the deadline', async t => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  let cancelled = false;
+  const body = new ReadableStream({ cancel() { cancelled = true; } });
+  const responsePromise = POST(new NextRequest('http://localhost/api/contact', { method: 'POST', body, duplex: 'half' }));
+  t.mock.timers.tick(10001);
+  assert.equal((await responsePromise).status, 408);
+  assert.equal(cancelled, true);
+  assert.equal(calls.length, 0);
 });
 afterEach(() => {
   global.fetch = originalFetch;

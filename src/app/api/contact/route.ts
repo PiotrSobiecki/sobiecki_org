@@ -5,18 +5,43 @@ const MAX_NAME = 200;
 const MAX_EMAIL = 320; // maks. długość adresu e-mail wg RFC 5321
 const MAX_MESSAGE = 5000;
 const MAX_BODY_BYTES = 40_000;
+const REQUEST_WINDOW_MS = 60_000;
+const MAX_REQUESTS_PER_WINDOW = 30;
+let windowStartedAt = 0;
+let requestCount = 0;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(req: NextRequest) {
+  // Process-wide backstop: never trust client-supplied IP headers for this limit.
+  // The production reverse proxy additionally enforces a shared limit.
+  const now = Date.now();
+  if (now - windowStartedAt >= REQUEST_WINDOW_MS) {
+    windowStartedAt = now;
+    requestCount = 0;
+  }
+  if (++requestCount > MAX_REQUESTS_PER_WINDOW) {
+    return NextResponse.json(
+      { error: "Zbyt wiele prób. Spróbuj ponownie za chwilę." },
+      { status: 429, headers: { "Retry-After": String(Math.max(1, Math.ceil((windowStartedAt + REQUEST_WINDOW_MS - now) / 1000))) } },
+    );
+  }
   const reader = req.body?.getReader();
   if (!reader) return NextResponse.json({ error: "Nieprawidłowe żądanie." }, { status: 400 });
   let body: unknown;
+  let bodyTimedOut = false;
+  const bodyTimeout = setTimeout(() => {
+    bodyTimedOut = true;
+    void reader.cancel().catch(() => {});
+  }, 10_000);
   try {
     const chunks: Uint8Array[] = [];
     let size = 0;
     while (true) {
       const { done, value } = await reader.read();
+      if (bodyTimedOut) {
+        return NextResponse.json({ error: "Przekroczono czas odbierania żądania." }, { status: 408 });
+      }
       if (done) break;
       size += value.byteLength;
       if (size > MAX_BODY_BYTES) {
@@ -32,6 +57,7 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   } finally {
+    clearTimeout(bodyTimeout);
     reader.releaseLock();
   }
   if (!body || typeof body !== "object" || Array.isArray(body)) {
