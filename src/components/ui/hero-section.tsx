@@ -79,6 +79,7 @@ export function HeroSection() {
 
     const originalText = "Przewiń w dół";
     let isScrambling = false;
+    let scrollInterval: ReturnType<typeof setInterval> | undefined;
 
     const scrambleText = () => {
       if (isScrambling) return;
@@ -88,10 +89,10 @@ export function HeroSection() {
       const maxIterations = originalText.length * 3;
       let currentIteration = 0;
 
-      const interval = setInterval(() => {
+      scrollInterval = setInterval(() => {
         if (currentIteration >= maxIterations) {
           scrollText.textContent = originalText;
-          clearInterval(interval);
+          clearInterval(scrollInterval);
           isScrambling = false;
           return;
         }
@@ -124,6 +125,7 @@ export function HeroSection() {
     scrollText.style.cursor = "pointer";
 
     return () => {
+      clearInterval(scrollInterval);
       scrollText.removeEventListener("mouseenter", scrambleText);
       scrollText.removeEventListener("click", handleClick);
     };

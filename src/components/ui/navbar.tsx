@@ -23,6 +23,45 @@ const NAV_ITEMS = [
 export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const previousOverflow = document.body.style.overflowY;
+    const trigger = menuButtonRef.current;
+    document.body.style.overflowY = "hidden";
+    menuRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setIsMobileMenuOpen(false);
+      }
+      if (event.key === "Tab") {
+        const elements = menuRef.current?.querySelectorAll<HTMLElement>("button, a[href]");
+        if (!elements?.length) return;
+        const first = elements[0];
+        const last = elements[elements.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    const desktop = window.matchMedia("(min-width: 1025px)");
+    const onResize = () => { if (desktop.matches) setIsMobileMenuOpen(false); };
+    document.addEventListener("keydown", onKeyDown);
+    desktop.addEventListener("change", onResize);
+    return () => {
+      document.body.style.overflowY = previousOverflow;
+      document.removeEventListener("keydown", onKeyDown);
+      desktop.removeEventListener("change", onResize);
+      trigger?.focus();
+    };
+  }, [isMobileMenuOpen]);
 
   useEffect(() => {
     const links = navRef.current?.querySelectorAll("a");
@@ -30,6 +69,7 @@ export function Navbar() {
 
     const handlers = new Map<HTMLAnchorElement, () => void>();
     const originalTexts = new Map<HTMLAnchorElement, string>();
+    const intervals = new Map<HTMLAnchorElement, ReturnType<typeof setInterval>>();
 
     links.forEach((link, index) => {
       const text = NAV_ITEMS[index]?.label || "";
@@ -38,6 +78,7 @@ export function Navbar() {
     });
 
     const scrambleText = (element: HTMLAnchorElement) => {
+      if (intervals.has(element)) return;
       const originalText = originalTexts.get(element) || "";
       if (!originalText) return;
 
@@ -52,6 +93,7 @@ export function Navbar() {
         if (currentIteration >= maxIterations) {
           element.textContent = originalText;
           clearInterval(interval);
+          intervals.delete(element);
           return;
         }
 
@@ -69,6 +111,7 @@ export function Navbar() {
         iteration += 1 / 3;
         currentIteration++;
       }, 30);
+      intervals.set(element, interval);
     };
 
     links.forEach((link) => {
@@ -78,6 +121,7 @@ export function Navbar() {
     });
 
     return () => {
+      intervals.forEach(clearInterval);
       handlers.forEach((handler, link) => {
         link.removeEventListener("mouseenter", handler);
       });
@@ -85,8 +129,7 @@ export function Navbar() {
   }, []);
 
   const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-    document.body.style.overflowY = !isMobileMenuOpen ? "hidden" : "auto";
+    setIsMobileMenuOpen(open => !open);
   };
 
   return (
@@ -129,9 +172,12 @@ export function Navbar() {
               Kontakt
             </Link>
             <button
+              ref={menuButtonRef}
               className="button_mobile"
               onClick={toggleMobileMenu}
-              aria-label="Open mobile menu"
+              aria-label="Otwórz menu"
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="mobile-menu"
             >
               {isMobileMenuOpen ? (
                 <X className="h-6 w-6" />
@@ -152,6 +198,10 @@ export function Navbar() {
         />
       )}
       <div
+        id="mobile-menu"
+        ref={menuRef}
+        inert={!isMobileMenuOpen}
+        aria-hidden={!isMobileMenuOpen}
         className={`fixed top-[88px] right-4 max-w-[360px] w-[calc(100%-28px)] bg-[#050505] border border-white/12 rounded-xl p-4 flex flex-col gap-4 shadow-2xl z-[110] transition-all ${
           isMobileMenuOpen
             ? "opacity-100 translate-y-0"
@@ -165,7 +215,7 @@ export function Navbar() {
           <button
             className="w-10 h-10 border border-white/40 rounded-md flex items-center justify-center text-white"
             onClick={toggleMobileMenu}
-            aria-label="Close menu"
+            aria-label="Zamknij menu"
           >
             <X className="h-5 w-5" />
           </button>
