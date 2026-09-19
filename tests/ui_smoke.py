@@ -73,7 +73,9 @@ with sync_playwright() as p:
     page.get_by_role("button", name="Zamknij menu dostępności").click()
 
     # Each game owns its canvas and its document listeners.
-    page.evaluate("window.openMinesweeper(); window.openMinesweeper();")
+    saper = page.get_by_role("link", name="saper", exact=True)
+    saper.click()
+    saper.click()
     canvases = page.locator("[data-minesweeper-canvas]")
     expect(canvases).to_have_count(2)
     first_before = canvases.nth(0).evaluate("c => c.toDataURL()")
@@ -81,6 +83,10 @@ with sync_playwright() as p:
     canvases.nth(1).click(button="right", position={"x": 15, "y": 15})
     assert canvases.nth(0).evaluate("c => c.toDataURL()") == first_before
     assert canvases.nth(1).evaluate("c => c.toDataURL()") != second_before
+    flagged = canvases.nth(1).evaluate("c => c.toDataURL()")
+    canvases.nth(1).click(position={"x": 75, "y": 75})
+    assert canvases.nth(1).evaluate("c => c.toDataURL()") != flagged
+    assert canvases.nth(0).evaluate("c => c.toDataURL()") == first_before
     page.get_by_role("button", name="Zamknij Sapera").nth(1).click()
     expect(canvases).to_have_count(1)
     assert page.evaluate("gameSignals.length === 4 && gameSignals.slice(2).every(s => s.aborted)")

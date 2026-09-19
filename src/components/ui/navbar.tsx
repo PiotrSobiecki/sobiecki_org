@@ -3,22 +3,14 @@ import Link from "next/link";
 import { isMotionReduced } from "@/utils/motion";
 import { useState, useEffect, useRef } from "react";
 import { Facebook, Menu, X } from "lucide-react";
-import { Minesweeper } from "../games/minesweeper";
+import { Minesweeper, openMinesweeper } from "../games/minesweeper";
 
 const CHARS = "01";
 
 const NAV_ITEMS = [
   { label: "usługi", href: "/#uslugi" },
   { label: "przykładowe projekty", href: "/#projekty" },
-  {
-    label: "saper",
-    href: "#",
-    onClick: () => {
-      if (typeof window !== "undefined" && "openMinesweeper" in window) {
-        (window as { openMinesweeper?: () => void }).openMinesweeper?.();
-      }
-    },
-  },
+  { label: "saper", href: "#", onClick: openMinesweeper },
 ];
 
 export function Navbar() {
