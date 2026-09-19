@@ -23,8 +23,12 @@ zależności nie oznacza braku błędów aplikacji.
 | Niski | Manifest deklarował ponad 250 pakietów pośrednich. | Zostało 12 zależności i 11 narzędzi odpowiadających faktycznym importom. Wersje z automatycznego PR-a Dependabota przeniesione do nowego manifestu. |
 | Niski | `next.config.ts` zawierał zbędny callback webpack z `any`, blokujący lint. | Usunięto callback, dodano typ NextConfig i jawny katalog śledzenia plików. |
 | Niski | Polityka prywatności zaprzeczała przekazywaniu danych zewnętrznym dostawcom. | Opisano faktyczne użycie Resend i Google reCAPTCHA; nie jest to pełny audyt prawny. |
+| Średni, wydajność | Strona główna ważyła 13,8 MB. Dwa filmy tła szły w 4,5 i 9,3 Mbps przy rozdzielczości 640x640, a `cover.png` bez kanału alfa zajmował 1,4 MB. | Przekodowanie H.264 CRF 32 do 444 i 644 KB przy SSIM 0,97 i 0,91, JPEG zamiast PNG (41 KB), plakaty i `preload="none"`, pobranie tła dopiero przy wejściu sekcji w kadr. Wejście na stronę: 2,25 MB, z czego 0,81 MB to skrypt samej reCAPTCHY. |
+| Średni | Żaden nagłówek bezpieczeństwa nie był ustawiany. | CSP, HSTS, `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy` i `Permissions-Policy` w `next.config.ts`. Smoke test sprawdza ich obecność i przewraca się na blokadzie CSP w konsoli. |
+| Średni, dostępność | Zapętlone tła wideo bez kontrolki pauzy, brak obsługi `prefers-reduced-motion` — WCAG 2.2.2 na poziomie A. | Przełącznik „Zatrzymaj animacje" w widgecie dostępności, zapamiętywany między wizytami. Ustawienie systemowe blokuje pobranie tła. Wyciszone animacje tekstu i pętla tła binarnego. |
+| Niski, SEO | Obraz Open Graph był czarną teksturą ważącą 1,33 MB, powyżej progu, od którego WhatsApp przestaje pobierać podglądy. | Karta 1200x630 z nazwą i opisem, 31 KB. |
 | Niski | Trzy zdjęcia kart usług były hotlinkowane z `images.unsplash.com`, a w repo leżało 5,2 MB plików bez żadnego odwołania. | Zdjęcia w `public/images` (256 KB), martwe pliki usunięte. Smoke test pilnuje, żeby żaden obraz, film ani font nie szedł do obcego CDN poza gstatic samej reCAPTCHY. |
-| Niski, SEO | Metadane strony były w ręcznym `<head>`, bez adresów kanonicznych, mapy witryny i `robots.txt`. | Metadata API Next.js, `metadataBase`, kanoniczne adresy obu stron, Open Graph z `images/cover.png`, `robots.ts` i `sitemap.ts`. |
+| Niski, SEO | Metadane strony były w ręcznym `<head>`, bez adresów kanonicznych, mapy witryny i `robots.txt`. | Metadata API Next.js, `metadataBase`, kanoniczne adresy obu stron, Open Graph, `robots.ts` i `sitemap.ts`. |
 
 ## Pozostałe problemy
 
@@ -40,17 +44,10 @@ zależności nie oznacza braku błędów aplikacji.
 3. **Indeksowanie wymaga dostępu do konta Google.** Weryfikacja własności
    `sobiecki.org` i zgłoszenie mapy witryny w Search Console pozostają po
    stronie właściciela. Mapa nie gwarantuje indeksacji ani pozycji.
-4. **Strona główna waży 13,8 MB.** Dwa autoodtwarzane filmy tła (5,39 i 5,38 MB)
-   oraz `cover.png` (1,33 MB) pobierają się przy wejściu, bez `preload="none"`
-   i bez plakatu. Pomiar Playwrightem na buildzie produkcyjnym.
-5. **Obraz Open Graph waży 1,33 MB.** WhatsApp nie pobiera podglądów powyżej
-   około 300 KB, więc link wysłany tym kanałem nie pokaże miniatury.
-6. **Brak nagłówków bezpieczeństwa.** `next.config.ts` nie ustawia CSP,
-   `X-Frame-Options`, `Referrer-Policy`, `X-Content-Type-Options`,
-   `Permissions-Policy` ani HSTS.
-7. **Zapętlone wideo bez możliwości zatrzymania.** WCAG 2.2.2 (poziom A) wymaga
-   mechanizmu pauzy dla ruchu trwającego ponad 5 s. Brakuje też obsługi
-   `prefers-reduced-motion`, mimo widgetu dostępności w stopce strony.
+4. **CSP dopuszcza `'unsafe-inline'` w `script-src`.** Saper wstrzykuje swój kod
+   przez `script.innerHTML`, a Next.js własny bootstrap; bez tej dyrektywy gra
+   przestaje działać. Zamknięcie wymaga przepisania Sapera na zwykły moduł.
+   Pozostałe dyrektywy i tak odcinają obce źródła.
 
 Statyczne `innerHTML` Sapera nie zawiera danych użytkownika; nie stwierdzono na
 tej podstawie XSS. Nie znaleziono śledzonych plików konfiguracji środowiska,
@@ -69,10 +66,14 @@ tej podstawie XSS. Nie znaleziono śledzonych plików konfiguracji środowiska,
 - Resend: `RESEND_API_KEY`, `RESEND_FROM`, `MAIL_TO`; Google nadal odpowiada za CAPTCHA.
 - Testy API izolują sieć: nie wysyłają wiadomości i nie potrzebują sekretów.
 - `npm run lint`, `npm run typecheck`, `npm test` (20 testów), `npm run build`: zaliczone.
+- Waga strony głównej mierzona Playwrightem na buildzie produkcyjnym: 13,80 MB
+  przed zmianami, 2,25 MB po nich. Pomiar bez przewijania, więc tło sekcji
+  projektów w ogóle się nie pobiera.
 - Playwright na buildzie produkcyjnym: treść karty HomeCashflow, adresy kanoniczne,
   `robots.txt` i `sitemap.xml`, blokada wysyłki bez CAPTCHA, dwa niezależne okna
-  Sapera z odpinaniem listenerów, klawiaturowa obsługa menu mobilnego, brak błędów
-  JavaScript — zaliczone. Test nie potwierdza doręczenia maila ani produkcyjnej
+  Sapera z odpinaniem listenerów, klawiaturowa obsługa menu mobilnego, plakaty
+  i odroczone tła wideo, przełącznik ruchu, nagłówki bezpieczeństwa, brak blokad
+  CSP i brak błędów JavaScript — zaliczone. Test nie potwierdza doręczenia maila ani produkcyjnej
   konfiguracji CAPTCHA.
 - Test integracyjny Resend (wcześniejszy): jedna wiadomość przesłana przez lokalny
   formularz z `noreply@sobiecki.org` do `it@sobiecki.org`, API zwróciło 200
