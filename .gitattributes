@@ -1,0 +1,7 @@
+# Jedno źródło prawdy dla końców linii: LF w repo i w kopii roboczej. Bez tego
+# `core.autocrlf` na Windowsie pokazywał całe pliki jako zmienione po zapisie.
+* text=auto eol=lf
+
+*.jpg binary
+*.png binary
+*.mp4 binary
