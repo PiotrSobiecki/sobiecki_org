@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
-import { Facebook } from "lucide-react";
+import { FacebookIcon } from "./icons";
 
 const CHARS = "01";
 
@@ -131,7 +131,7 @@ export function Footer() {
             className="w-10 h-10 flex items-center justify-center rounded-full border border-white/20 hover:border-white hover:bg-white/10 transition-colors"
             aria-label="Facebook"
           >
-            <Facebook className="h-5 w-5" />
+            <FacebookIcon className="h-5 w-5" />
           </a>
         </div>
         <p>

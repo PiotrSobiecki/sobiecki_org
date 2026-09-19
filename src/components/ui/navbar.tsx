@@ -2,7 +2,8 @@
 import Link from "next/link";
 import { isMotionReduced } from "@/utils/motion";
 import { useState, useEffect, useRef } from "react";
-import { Facebook, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import { FacebookIcon } from "./icons";
 import { Minesweeper, openMinesweeper } from "../games/minesweeper";
 
 const CHARS = "01";
@@ -159,7 +160,7 @@ export function Navbar() {
               className="w-12 h-12 flex items-center justify-center border border-white/40 hover:border-white hover:bg-white/10 transition-colors"
               aria-label="Facebook"
             >
-              <Facebook className="h-5 w-5" />
+              <FacebookIcon className="h-5 w-5" />
             </Link>
             <Link href="#kontakt" className="btn btn_primary hidden md:inline-flex">
               Kontakt
