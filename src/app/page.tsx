@@ -65,7 +65,7 @@ export default function Home() {
     {
       name: "HomeCashflow",
       description:
-        "Aplikacja do zarządzania budżetem domowym i wspólnymi finansami. Pomaga kontrolować wydatki stałe i zmienne, planować oszczędności oraz śledzić miesięczne podsumowania i prognozy finansowe.",
+        "Aplikacja do zarządzania budżetem domowym i wspólnymi finansami. Pomaga kontrolować wydatki, planować oszczędności i śledzić prognozy finansowe. Umożliwia też sterowanie inteligentnymi wtyczkami i urządzeniami oraz monitorowanie zużycia energii i jej kosztów.",
       url: "https://homecashflow.org",
     },
     {
