@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { ArrowRight, Code, Database, Bot, Mail } from "lucide-react";
 import useRevealOnIntersect from "@/hooks/useRevealOnIntersect";
+import { isMotionReduced } from "@/utils/motion";
 import { BackgroundVideo } from "@/components/ui/background-video";
 
 const CHARS = "01";
@@ -29,6 +30,11 @@ export function HeroSection() {
     }
 
     lead.textContent = leadText;
+
+    if (isMotionReduced()) {
+      lead.style.opacity = "1";
+      return;
+    }
 
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
     let intervalId: ReturnType<typeof setInterval> | null = null;
@@ -83,7 +89,7 @@ export function HeroSection() {
     let scrollInterval: ReturnType<typeof setInterval> | undefined;
 
     const scrambleText = () => {
-      if (isScrambling) return;
+      if (isScrambling || isMotionReduced()) return;
       isScrambling = true;
 
       let iteration = 0;

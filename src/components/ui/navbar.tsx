@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { isMotionReduced } from "@/utils/motion";
 import { useState, useEffect, useRef } from "react";
 import { Facebook, Menu, X } from "lucide-react";
 import { Minesweeper } from "../games/minesweeper";
@@ -78,7 +79,7 @@ export function Navbar() {
     });
 
     const scrambleText = (element: HTMLAnchorElement) => {
-      if (intervals.has(element)) return;
+      if (intervals.has(element) || isMotionReduced()) return;
       const originalText = originalTexts.get(element) || "";
       if (!originalText) return;
 

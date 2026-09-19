@@ -65,6 +65,13 @@ with sync_playwright() as p:
     page.get_by_role("button", name="Wyślij wiadomość").click()
     expect(page.get_by_text("Potwierdź, że nie jesteś robotem.", exact=True)).to_be_visible()
 
+    # Przelacznik ruchu zatrzymuje tlo i zostaje na kolejna wizyte.
+    page.get_by_role("button", name="Ustawienia dostępności").click()
+    page.get_by_role("button", name="Zatrzymaj animacje").click()
+    assert page.evaluate("document.documentElement.classList.contains('reduce-motion')")
+    assert page.evaluate("document.querySelector('section.hero video').paused")
+    page.get_by_role("button", name="Zamknij menu dostępności").click()
+
     # Each game owns its canvas and its document listeners.
     page.evaluate("window.openMinesweeper(); window.openMinesweeper();")
     canvases = page.locator("[data-minesweeper-canvas]")
@@ -107,5 +114,12 @@ with sync_playwright() as p:
         assert key in headers, key
     assert "frame-ancestors 'none'" in headers["content-security-policy"]
     assert not errors, errors
-    print("PASS: project content, SEO, CAPTCHA guard, independent games and listener cleanup, keyboard menu, local images, no browser errors")
+
+    # Ustawienie systemowe samo w sobie nie dopuszcza do pobrania tla.
+    reduced = browser.new_page(viewport={"width": 1280, "height": 900}, reduced_motion="reduce")
+    reduced.goto("http://127.0.0.1:3100", wait_until="networkidle")
+    assert reduced.evaluate("document.querySelector('section.hero video').getAttribute('src') === null")
+    reduced.close()
+
+    print("PASS: project content, SEO, CAPTCHA guard, independent games and listener cleanup, keyboard menu, local images, reduced motion, no browser errors")
     browser.close()

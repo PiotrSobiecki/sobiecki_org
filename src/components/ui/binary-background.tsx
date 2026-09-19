@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef } from "react";
+import { isMotionReduced } from "@/utils/motion";
 
 interface BinaryBackgroundProps {
   className?: string;
@@ -126,7 +127,10 @@ export const BinaryBackground: React.FC<BinaryBackgroundProps> = ({
         gradientHeight
       );
 
-      animationFrameRef.current = requestAnimationFrame(draw);
+      // Przy wyłączonym ruchu zostaje jedna klatka, bez kolejnej pętli.
+      if (!isMotionReduced()) {
+        animationFrameRef.current = requestAnimationFrame(draw);
+      }
     };
 
     animationFrameRef.current = requestAnimationFrame(draw);

@@ -5,15 +5,21 @@ import {
   Accessibility,
   Eye,
   MonitorSmartphone,
+  Pause,
   Text,
   X,
 } from "lucide-react";
+import {
+  REDUCED_MOTION_CLASS,
+  REDUCED_MOTION_STORAGE_KEY,
+} from "@/utils/motion";
 
 export function AccessibilityWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [highContrast, setHighContrast] = useState(false);
   const [largeText, setLargeText] = useState(false);
   const [dyslexicFont, setDyslexicFont] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -34,6 +40,19 @@ export function AccessibilityWidget() {
     };
   }, []);
 
+  // Wybór zostaje na kolejne wizyty; ustawienie systemowe działa niezależnie.
+  useEffect(() => {
+    let stored: string | null = null;
+    try {
+      stored = localStorage.getItem(REDUCED_MOTION_STORAGE_KEY);
+    } catch {
+      /* prywatne okno albo zablokowane dane witryny */
+    }
+    if (stored !== "1") return;
+    setReduceMotion(true);
+    document.documentElement.classList.add(REDUCED_MOTION_CLASS);
+  }, []);
+
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
@@ -46,6 +65,18 @@ export function AccessibilityWidget() {
   const toggleLargeText = () => {
     setLargeText(!largeText);
     document.documentElement.classList.toggle("large-text");
+  };
+
+  const toggleReduceMotion = () => {
+    const next = !reduceMotion;
+    setReduceMotion(next);
+    document.documentElement.classList.toggle(REDUCED_MOTION_CLASS, next);
+    try {
+      if (next) localStorage.setItem(REDUCED_MOTION_STORAGE_KEY, "1");
+      else localStorage.removeItem(REDUCED_MOTION_STORAGE_KEY);
+    } catch {
+      /* prywatne okno albo zablokowane dane witryny */
+    }
   };
 
   const toggleDyslexicFont = () => {
@@ -211,6 +242,21 @@ export function AccessibilityWidget() {
               >
                 <Eye className="h-6 w-6 mr-3 flex-shrink-0" />
                 <span className="text-left">Czcionka dla dysleksji</span>
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={toggleReduceMotion}
+                className={`flex items-center w-full p-3 rounded-lg transition-colors text-left ${
+                  reduceMotion
+                    ? "bg-white text-black border-2 border-white"
+                    : "hover:bg-white/20 text-white border border-white/40"
+                }`}
+                style={{ fontSize: "1rem", fontWeight: 500 }}
+                aria-pressed={reduceMotion}
+              >
+                <Pause className="h-6 w-6 mr-3 flex-shrink-0" />
+                <span className="text-left">Zatrzymaj animacje</span>
               </button>
             </li>
           </ul>

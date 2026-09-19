@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import type { CSSProperties } from "react";
+import useReducedMotion from "@/hooks/useReducedMotion";
 
 type BackgroundVideoProps = {
   src: string;
@@ -17,12 +18,18 @@ export function BackgroundVideo({
   style,
 }: BackgroundVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const reducedMotion = useReducedMotion();
 
   // Plik pobiera się dopiero, gdy sekcja wchodzi w kadr, a poza kadrem
-  // odtwarzanie stoi — do tego czasu widać plakat.
+  // odtwarzanie stoi. Przy wyłączonym ruchu zostaje sam plakat.
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+
+    if (reducedMotion) {
+      video.pause();
+      return;
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -38,7 +45,7 @@ export function BackgroundVideo({
 
     observer.observe(video);
     return () => observer.disconnect();
-  }, [src]);
+  }, [src, reducedMotion]);
 
   return (
     <video
