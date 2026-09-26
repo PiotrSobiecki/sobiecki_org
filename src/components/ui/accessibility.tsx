@@ -14,12 +14,24 @@ import {
   REDUCED_MOTION_STORAGE_KEY,
 } from "@/utils/motion";
 
+// Wybór zostaje na kolejne wizyty; ustawienie systemowe działa niezależnie.
+const storedReduceMotion = (): boolean => {
+  if (typeof window === "undefined") return false;
+  try {
+    return localStorage.getItem(REDUCED_MOTION_STORAGE_KEY) === "1";
+  } catch {
+    return false; // prywatne okno albo zablokowane dane witryny
+  }
+};
+
 export function AccessibilityWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [highContrast, setHighContrast] = useState(false);
   const [largeText, setLargeText] = useState(false);
   const [dyslexicFont, setDyslexicFont] = useState(false);
-  const [reduceMotion, setReduceMotion] = useState(false);
+  // Menu jest zamknięte przy hydracji, więc wartość z localStorage nie zmienia
+  // HTML z serwera.
+  const [reduceMotion, setReduceMotion] = useState(storedReduceMotion);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -40,18 +52,9 @@ export function AccessibilityWidget() {
     };
   }, []);
 
-  // Wybór zostaje na kolejne wizyty; ustawienie systemowe działa niezależnie.
   useEffect(() => {
-    let stored: string | null = null;
-    try {
-      stored = localStorage.getItem(REDUCED_MOTION_STORAGE_KEY);
-    } catch {
-      /* prywatne okno albo zablokowane dane witryny */
-    }
-    if (stored !== "1") return;
-    setReduceMotion(true);
-    document.documentElement.classList.add(REDUCED_MOTION_CLASS);
-  }, []);
+    document.documentElement.classList.toggle(REDUCED_MOTION_CLASS, reduceMotion);
+  }, [reduceMotion]);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -70,7 +73,6 @@ export function AccessibilityWidget() {
   const toggleReduceMotion = () => {
     const next = !reduceMotion;
     setReduceMotion(next);
-    document.documentElement.classList.toggle(REDUCED_MOTION_CLASS, next);
     try {
       if (next) localStorage.setItem(REDUCED_MOTION_STORAGE_KEY, "1");
       else localStorage.removeItem(REDUCED_MOTION_STORAGE_KEY);
