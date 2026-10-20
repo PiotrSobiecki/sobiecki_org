@@ -6,9 +6,14 @@ const ts = require('typescript');
 const { NextRequest } = require('next/server');
 
 // Execute the actual route with mocked network calls; no real mail or credentials.
-const compiled = ts.transpileModule(fs.readFileSync('src/app/api/contact/route.ts', 'utf8'), {
+const load = file => ts.transpileModule(fs.readFileSync(file, 'utf8'), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
 }).outputText;
+const compiled = load('src/app/api/contact/route.ts');
+// The route takes its topic allow-list from the page content module.
+const content = {};
+vm.runInThisContext('(function(require,exports){' + load('src/content/oferta.ts') + '\n})')(require, content);
+const routeRequire = id => (id === '@/content/oferta' ? content : require(id));
 let POST;
 const originalFetch = global.fetch;
 const keys = ['RESEND_API_KEY', 'RESEND_FROM', 'MAIL_TO', 'RECAPTCHA_SECRET_KEY'];
@@ -16,7 +21,7 @@ let previous;
 let calls;
 beforeEach(() => {
   const moduleExports = {};
-  vm.runInThisContext('(function(require,exports){' + compiled + '\n})')(require, moduleExports);
+  vm.runInThisContext('(function(require,exports){' + compiled + '\n})')(routeRequire, moduleExports);
   POST = moduleExports.POST;
   previous = Object.fromEntries(keys.map(key => [key, process.env[key]]));
   Object.assign(process.env, { RESEND_API_KEY: 'test-only', RESEND_FROM: 'site@example.org', MAIL_TO: 'owner@example.org', RECAPTCHA_SECRET_KEY: 'test-secret' });
@@ -65,7 +70,7 @@ afterEach(() => {
     else process.env[key] = previous[key];
   }
 });
-const valid = { name: 'Jan Testowy', email: 'jan@example.org', message: 'Przykładowa wiadomość', token: 'test-token' };
+const valid = { name: 'Jan Testowy', email: 'jan@example.org', topic: 'Agent AI', message: 'Przykładowa wiadomość', token: 'test-token' };
 const request = body => new NextRequest('http://localhost/api/contact', {
   method: 'POST', body: typeof body === 'string' ? body : JSON.stringify(body),
   headers: { 'Content-Type': 'application/json' },
@@ -84,6 +89,7 @@ test('sends plain text to configured recipient with visitor Reply-To after CAPTC
   assert.equal(sent.from, 'site@example.org');
   assert.equal(sent.reply_to, valid.email);
   assert.ok(sent.text.includes(valid.message));
+  assert.ok(sent.text.includes('Temat: Agent AI'));
   assert.equal(sent.html, undefined);
 });
 
@@ -92,6 +98,8 @@ for (const [label, input] of [
   ['missing field', { ...valid, name: '' }], ['missing token', { ...valid, token: '' }],
   ['bad email', { ...valid, email: 'bad' }], ['header injection', { ...valid, name: 'Name\r\nBcc: other@example.org' }],
   ['oversized message', { ...valid, message: 'x'.repeat(5001) }],
+  ['unknown topic', { ...valid, topic: 'Kredyt hipoteczny' }], ['missing topic', { ...valid, topic: undefined }],
+  ['non-string topic', { ...valid, topic: ['Agent AI'] }],
 ]) {
   test('rejects ' + label + ' before network calls', async () => {
     assert.equal((await POST(request(input))).status, 400);

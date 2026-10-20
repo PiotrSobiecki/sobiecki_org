@@ -12,6 +12,7 @@ with sync_playwright() as p:
     page.locator("#kontakt").scroll_into_view_if_needed()
     page.locator("#name").fill("Jan Testowy — test Resend")
     page.locator("#email").fill("it@sobiecki.org")
+    page.locator("#topic").select_option("Strona lub aplikacja")
     page.locator("#message").fill(
         "Dzień dobry!\n\nChciałbym zapytać o przygotowanie strony internetowej "
         "dla mojej firmy. Zależy mi na prezentacji usług i formularzu kontaktowym. "

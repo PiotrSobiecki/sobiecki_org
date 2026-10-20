@@ -53,14 +53,16 @@ with sync_playwright() as p:
     assert sitemap.status == 200 and "https://sobiecki.org/polityka-prywatnosci" in sitemap.text()
     page.locator("#uslugi").scroll_into_view_if_needed()
     accents = page.locator(".service-card__accent")
-    expect(accents).to_have_count(3)
-    for i, name in enumerate(["uslugi-web", "uslugi-blockchain", "uslugi-boty"]):
-        assert f"/images/{name}.jpg" in accents.nth(i).evaluate("e => e.style.backgroundImage")
+    expect(accents).to_have_count(8)
+    used = " ".join(accents.nth(i).evaluate("e => e.style.backgroundImage") for i in range(8))
+    for name in ["uslugi-web", "uslugi-blockchain", "uslugi-boty"]:
+        assert f"/images/{name}.jpg" in used
         assert page.request.get(f"http://127.0.0.1:3100/images/{name}.jpg").status == 200
     assert not foreign, foreign
     page.locator("#kontakt").scroll_into_view_if_needed()
     page.locator("#name").fill("Jan Testowy")
     page.locator("#email").fill("it@sobiecki.org")
+    page.locator("#topic").select_option("Agent AI")
     page.locator("#message").fill("Przykładowa wiadomość testowa z formularza sobiecki.org.")
     page.get_by_role("button", name="Wyślij wiadomość").click()
     expect(page.get_by_text("Potwierdź, że nie jesteś robotem.", exact=True)).to_be_visible()
@@ -73,7 +75,7 @@ with sync_playwright() as p:
     page.get_by_role("button", name="Zamknij menu dostępności").click()
 
     # Each game owns its canvas and its document listeners.
-    saper = page.get_by_role("link", name="saper", exact=True)
+    saper = page.get_by_role("button", name="Zagraj w sapera", exact=True)
     saper.click()
     saper.click()
     canvases = page.locator("[data-minesweeper-canvas]")

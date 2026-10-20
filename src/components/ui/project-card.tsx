@@ -4,7 +4,11 @@ import { CSSProperties, useMemo, useState, useCallback } from "react";
 interface ProjectCardProps {
   name: string;
   description: string;
-  url: string;
+  url?: string;
+  label?: string;
+  status?: string;
+  facts?: string[];
+  tech?: string;
   style?: CSSProperties;
   className?: string;
 }
@@ -13,6 +17,10 @@ export function ProjectCard({
   name,
   description,
   url,
+  label = "Projekt",
+  status,
+  facts,
+  tech,
   style,
   className = "",
 }: ProjectCardProps) {
@@ -98,17 +106,40 @@ export function ProjectCard({
         </svg>
       )}
       <div className="project-card__content">
-        <p className="project-card__label">Projekt</p>
+        <p className="project-card__label">
+          {label}
+          {status && (
+            <span className="project-card__status">
+              <span className="sr-only">Status: </span>
+              {status}
+            </span>
+          )}
+        </p>
         <h3>{name}</h3>
         <p className="project-card__description">{description}</p>
-        <a
-          href={url}
-          target="_blank"
-          rel="noreferrer"
-          className="btn btn_secondary"
-        >
-          Odwiedź stronę
-        </a>
+        {facts && (
+          <ul className="project-card__facts">
+            {facts.map((fact) => (
+              <li key={fact}>{fact}</li>
+            ))}
+          </ul>
+        )}
+        {tech && (
+          <p className="project-card__tech">
+            <span className="sr-only">Technologie: </span>
+            {tech}
+          </p>
+        )}
+        {url && (
+          <a
+            href={url}
+            target="_blank"
+            rel="noreferrer"
+            className="btn btn_secondary"
+          >
+            Odwiedź stronę
+          </a>
+        )}
       </div>
     </article>
   );

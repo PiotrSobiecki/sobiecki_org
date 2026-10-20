@@ -4,14 +4,16 @@ import { isMotionReduced } from "@/utils/motion";
 import { useState, useEffect, useRef } from "react";
 import { Menu, X } from "lucide-react";
 import { FacebookIcon } from "./icons";
-import { Minesweeper, openMinesweeper } from "../games/minesweeper";
+import { Minesweeper } from "../games/minesweeper";
 
 const CHARS = "01";
 
 const NAV_ITEMS = [
   { label: "usługi", href: "/#uslugi" },
-  { label: "przykładowe projekty", href: "/#projekty" },
-  { label: "saper", href: "#", onClick: openMinesweeper },
+  { label: "wdrożenia", href: "/#wdrozenia" },
+  { label: "proces", href: "/#proces" },
+  { label: "faq", href: "/#faq" },
+  { label: "darmowy audyt", href: "https://audyt.sobiecki.org" },
 ];
 
 export function Navbar() {
@@ -137,16 +139,7 @@ export function Navbar() {
 
           <nav className="site-nav" ref={navRef}>
             {NAV_ITEMS.map((item) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                onClick={(e) => {
-                  if (item.onClick) {
-                    e.preventDefault();
-                    item.onClick();
-                  }
-                }}
-              >
+              <Link key={item.label} href={item.href}>
                 {item.label}
               </Link>
             ))}
@@ -162,7 +155,7 @@ export function Navbar() {
             >
               <FacebookIcon className="h-5 w-5" />
             </Link>
-            <Link href="#kontakt" className="btn btn_primary hidden md:inline-flex">
+            <Link href="/#kontakt" className="btn btn_primary hidden md:inline-flex">
               Kontakt
             </Link>
             <button
@@ -219,13 +212,7 @@ export function Navbar() {
             <Link
               key={item.label}
               href={item.href}
-              onClick={(e) => {
-                if (item.onClick) {
-                  e.preventDefault();
-                  item.onClick();
-                }
-                toggleMobileMenu();
-              }}
+              onClick={toggleMobileMenu}
               className="block text-white text-base lowercase tracking-widest py-3 border-b border-white/8"
               style={{ fontFamily: '"Courier New", monospace' }}
             >
@@ -234,7 +221,7 @@ export function Navbar() {
           ))}
         </nav>
         <Link
-          href="#kontakt"
+          href="/#kontakt"
           className="btn btn_primary w-full justify-center"
           onClick={toggleMobileMenu}
           style={{ fontFamily: '"Courier New", monospace' }}

@@ -4,11 +4,11 @@ import { Footer } from "@/components/ui/footer";
 
 export const metadata: Metadata = {
   title: "Polityka prywatności",
-  description: "Zasady przetwarzania danych z formularza kontaktowego, ochrona prywatności i kontakt z administratorem serwisu sobiecki.org.",
+  description: "Formularz kontaktowy przetwarza imię i nazwisko, adres e-mail, temat i treść wiadomości wyłącznie po to, by odpowiedzieć na zapytanie.",
   alternates: { canonical: "/polityka-prywatnosci" },
   openGraph: {
     title: "Polityka prywatności | Piotr Sobiecki",
-    description: "Zasady przetwarzania danych i ochrony prywatności w serwisie sobiecki.org.",
+    description: "Formularz kontaktowy przetwarza imię i nazwisko, adres e-mail, temat i treść wiadomości wyłącznie po to, by odpowiedzieć na zapytanie.",
     url: "https://sobiecki.org/polityka-prywatnosci",
   },
 };
@@ -52,7 +52,7 @@ export default function PolitykaPrywatnosci() {
               <ul className="list-disc pl-6 space-y-2 text-white/70">
                 <li>
                   Przetwarzamy dane podane w formularzu kontaktowym (imię,
-                  nazwisko, adres e-mail, treść wiadomości) wyłącznie w celu
+                  nazwisko, adres e-mail, temat, treść wiadomości) wyłącznie w celu
                   udzielenia odpowiedzi na zapytanie.
                 </li>
                 <li>
@@ -76,8 +76,8 @@ export default function PolitykaPrywatnosci() {
               </h2>
               <p className="text-white/70">
                 Do dostarczenia wiadomości z formularza korzystamy z Resend,
-                któremu przekazujemy imię i nazwisko, adres e-mail oraz treść
-                wiadomości. Google reCAPTCHA służy do ochrony formularza przed
+                któremu przekazujemy imię i nazwisko, adres e-mail, temat oraz
+                treść wiadomości. Google reCAPTCHA służy do ochrony formularza przed
                 spamem i przetwarza dane związane z weryfikacją użytkownika.
               </p>
             </div>

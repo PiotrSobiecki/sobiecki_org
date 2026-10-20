@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { ArrowRight, Code, Database, Bot, Mail } from "lucide-react";
+import { ArrowRight, Mail } from "lucide-react";
 import useRevealOnIntersect from "@/hooks/useRevealOnIntersect";
 import { isMotionReduced } from "@/utils/motion";
 import { BackgroundVideo } from "@/components/ui/background-video";
+import { hero } from "@/content/oferta";
 
 const CHARS = "01";
 
@@ -16,8 +17,7 @@ export function HeroSection() {
     rootMargin: "0px 0px -20% 0px",
   });
 
-  const leadText =
-    "TWORZENIE NOWOCZESNYCH APLIKACJI I STRON INTERNETOWYCH, ANALIZA DANYCH BLOCKCHAIN, BUDOWA BOTÓW MONITORUJĄCYCH ORAZ KOMPLEKSOWE DORADZTWO IT. ROZWIĄZANIA STABILNE, PRZEJRZYSTE I DOSTOSOWANE DO TWOICH POTRZEB.";
+  const leadText = hero.lead;
 
   useEffect(() => {
     const lead = leadRef.current;
@@ -166,12 +166,13 @@ export function HeroSection() {
       </div>
       <div className="container hero__grid relative z-10">
         <div className="hero__content">
+          <p className="hero__badge">{hero.badge}</p>
           <h1
             className={`hero__title${
               isHeroVisible ? " hero__title--visible" : ""
             }`}
           >
-            ROZWIĄZANIA CYFROWE DOSTOSOWANE DO TWOICH POTRZEB
+            {hero.title}
           </h1>
         </div>
         <div className="hero__panel">
@@ -179,37 +180,27 @@ export function HeroSection() {
             {leadText}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 mt-8">
-            <Link href="#uslugi">
-              <button className="btn btn_secondary">
-                Moje usługi
-                <ArrowRight className="h-5 w-5" />
-              </button>
+            <Link href="#kontakt" className="btn btn_primary">
+              <Mail className="h-5 w-5" aria-hidden="true" />
+              {hero.primaryCta}
             </Link>
-            <Link href="#kontakt">
-              <button className="btn btn_primary">
-                <Mail className="h-5 w-5" />
-                Skontaktuj się
-              </button>
+            <Link href="#wdrozenia" className="btn btn_secondary">
+              {hero.secondaryCta}
+              <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </Link>
           </div>
-          <div className="flex items-center gap-6 mt-8">
-            <div className="flex items-center gap-2">
-              <Code className="h-6 w-6 text-white" />
-              <span className="text-sm font-medium text-white/80">
-                Aplikacje Webowe
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Database className="h-6 w-6 text-white" />
-              <span className="text-sm font-medium text-white/80">
-                Blockchain
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Bot className="h-6 w-6 text-white" />
-              <span className="text-sm font-medium text-white/80">Boty</span>
-            </div>
-          </div>
+          <a href={hero.auditUrl} className="hero__audit">
+            {hero.auditCta}
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </a>
+          <ul className="hero__stats">
+            {hero.stats.map((stat) => (
+              <li key={stat.value} className="hero__stat">
+                <strong>{stat.value}</strong>
+                <span>{stat.label}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
       <div className="hero__scroll">
