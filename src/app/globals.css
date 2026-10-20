@@ -1304,3 +1304,9 @@ section {
   margin-top: 24px;
   align-self: flex-start;
 }
+
+/* Narzędzie audytu: body ma Inter z next/font, a strona mówi Courier New. */
+.audit-tool,
+.audit-tool * {
+  font-family: "Courier New", monospace;
+}

@@ -59,6 +59,14 @@ export default function PolitykaPrywatnosci() {
                   Dane techniczne (np. adres IP, dane o przeglądarce) mogą być
                   przetwarzane w celach statystycznych i bezpieczeństwa.
                 </li>
+                <li>
+                  Darmowy audyt (/audyt) przetwarza adres sprawdzanej strony
+                  i wynik audytu tylko na czas jego trwania, najdłużej godzinę,
+                  i ich nie zapisuje. Przed startem audytu Google reCAPTCHA
+                  sprawdza, czy nie jesteś robotem. Audyt pobiera wyłącznie
+                  publiczne dane sprawdzanej strony, a szybkość mierzy przez
+                  Google PageSpeed Insights.
+                </li>
               </ul>
             </div>
             <div className="card">

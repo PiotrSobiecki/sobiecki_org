@@ -20,7 +20,7 @@ export type CaseStudy = {
   link?: { href: string; label: string };
 };
 
-const AUDIT_LINK = { href: "https://audyt.sobiecki.org", label: "Sprawdź swoją stronę za darmo" };
+const AUDIT_LINK = { href: "/audyt", label: "Sprawdź swoją stronę za darmo" };
 
 export type Product = {
   name: string;
@@ -50,7 +50,7 @@ export const hero = {
   primaryCta: "Umów 30 minut rozmowy",
   secondaryCta: "Zobacz wdrożenia",
   auditCta: "Sprawdź swoją stronę: darmowy audyt SEO i bezpieczeństwa",
-  auditUrl: "https://audyt.sobiecki.org",
+  auditUrl: "/audyt",
   stats: [
     { value: "~14 tys.", label: "rekordów w kampanii voicebota" },
     { value: "1000+", label: "commitów w jednym systemie CRM na produkcji" },

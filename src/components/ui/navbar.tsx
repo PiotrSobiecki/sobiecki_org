@@ -13,7 +13,7 @@ const NAV_ITEMS = [
   { label: "wdrożenia", href: "/#wdrozenia" },
   { label: "proces", href: "/#proces" },
   { label: "faq", href: "/#faq" },
-  { label: "darmowy audyt", href: "https://audyt.sobiecki.org" },
+  { label: "darmowy audyt", href: "/audyt" },
 ];
 
 export function Navbar() {

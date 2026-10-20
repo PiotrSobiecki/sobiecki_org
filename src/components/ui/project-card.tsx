@@ -135,8 +135,7 @@ export function ProjectCard({
         {url && (
           <a
             href={url}
-            target="_blank"
-            rel="noreferrer"
+            {...(url.startsWith("http") ? { target: "_blank", rel: "noreferrer" } : {})}
             className="btn btn_secondary"
           >
             {urlLabel}
