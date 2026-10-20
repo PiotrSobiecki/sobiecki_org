@@ -5,6 +5,7 @@ interface ProjectCardProps {
   name: string;
   description: string;
   url?: string;
+  urlLabel?: string;
   label?: string;
   status?: string;
   facts?: string[];
@@ -17,6 +18,7 @@ export function ProjectCard({
   name,
   description,
   url,
+  urlLabel = "Odwiedź stronę",
   label = "Projekt",
   status,
   facts,
@@ -137,7 +139,7 @@ export function ProjectCard({
             rel="noreferrer"
             className="btn btn_secondary"
           >
-            Odwiedź stronę
+            {urlLabel}
           </a>
         )}
       </div>

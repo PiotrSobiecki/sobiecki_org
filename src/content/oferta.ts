@@ -6,6 +6,7 @@ export type Service = {
   category: string;
   examples: string[];
   accentImage?: string;
+  link?: { href: string; label: string };
 };
 
 export type CaseStudy = {
@@ -15,7 +16,11 @@ export type CaseStudy = {
   description: string;
   facts: string[];
   tech: string;
+  // Tylko własne narzędzia; wdrożenia u klientów nie mają linków.
+  link?: { href: string; label: string };
 };
+
+const AUDIT_LINK = { href: "https://audyt.sobiecki.org", label: "Sprawdź swoją stronę za darmo" };
 
 export type Product = {
   name: string;
@@ -162,6 +167,7 @@ export const services: Service[] = [
       "Poczta: SPF, DKIM, DMARC",
     ],
     accentImage: "/images/uslugi-web.jpg",
+    link: AUDIT_LINK,
   },
 ];
 
@@ -293,6 +299,7 @@ export const caseStudies: CaseStudy[] = [
       "Crawl do 500 podstron, PageSpeed, SSL, nagłówki i poczta. Agent AI poprawia kod strony albo pisze kroki naprawy.",
     facts: ["500 podstron w kilka minut", "raport z priorytetami"],
     tech: "TanStack Start, Cloudflare, Claude Code",
+    link: AUDIT_LINK,
   },
 ];
 

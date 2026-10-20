@@ -164,6 +164,8 @@ export default function Home() {
                 status={item.status}
                 facts={item.facts}
                 tech={item.tech}
+                url={item.link?.href}
+                urlLabel={item.link?.label}
                 style={getCardStyle(isVisible, index)}
               />
             ))}

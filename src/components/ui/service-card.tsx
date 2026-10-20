@@ -11,6 +11,7 @@ interface ServiceCardProps {
     category: string;
     accentImage?: string;
     examples?: string[];
+    link?: { href: string; label: string };
   };
   index: number;
   isVisible: boolean;
@@ -82,6 +83,11 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
               <li key={example}>{example}</li>
             ))}
           </ul>
+        )}
+        {service.link && (
+          <a href={service.link.href} className="btn btn_primary service-card__link">
+            {service.link.label}
+          </a>
         )}
       </div>
     </article>

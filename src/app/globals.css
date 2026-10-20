@@ -1299,3 +1299,8 @@ section {
 .faq__list {
   font-family: "Courier New", monospace;
 }
+
+.service-card__link {
+  margin-top: 24px;
+  align-self: flex-start;
+}
