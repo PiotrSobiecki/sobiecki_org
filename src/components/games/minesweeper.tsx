@@ -18,7 +18,7 @@ type Cell = {
 
 type Status = "playing" | "lost" | "won";
 
-// Otwarcie zgłasza navbar; komponent nasłuchuje, zamiast wieszać się na window.
+// Otwarcie zgłasza stopka; komponent nasłuchuje, zamiast wieszać się na window.
 const openListeners = new Set<() => void>();
 
 export const openMinesweeper = (): void => {

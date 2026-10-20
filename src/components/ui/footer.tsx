@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { FacebookIcon } from "./icons";
+import { openMinesweeper } from "../games/minesweeper";
 
 const CHARS = "01";
 
@@ -11,7 +12,7 @@ export function Footer() {
 
   const TILE_LINKS = [
     { label: "usługi", href: "/#uslugi" },
-    { label: "przykładowe projekty", href: "/#projekty" },
+    { label: "wdrożenia", href: "/#wdrozenia" },
     { label: "kontakt", href: "/#kontakt" },
     { label: "polityka prywatności", href: "/polityka-prywatnosci" },
   ];
@@ -104,6 +105,14 @@ export function Footer() {
             {tile.label}
           </Link>
         ))}
+        <button
+          type="button"
+          className="footer__tile"
+          data-binary-link="true"
+          onClick={openMinesweeper}
+        >
+          Zagraj w sapera
+        </button>
       </div>
       <div className="container footer__about">
         <div className="flex items-center justify-center mb-6">
@@ -135,7 +144,7 @@ export function Footer() {
           </a>
         </div>
         <p>
-          Profesjonalne usługi informatyczne - wsparcie IT na najwyższym poziomie.
+          Agenci AI, CRM i automatyzacje dla firm.
         </p>
       </div>
       <div className="footer__bottom">

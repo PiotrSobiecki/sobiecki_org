@@ -10,6 +10,8 @@ interface ServiceCardProps {
     description: string;
     category: string;
     accentImage?: string;
+    examples?: string[];
+    link?: { href: string; label: string };
   };
   index: number;
   isVisible: boolean;
@@ -27,7 +29,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
 
   useEffect(() => {
     const handleResize = () => {
-      setIsCompactStack(window.innerWidth <= 600);
+      setIsCompactStack(window.innerWidth <= 640);
     };
 
     handleResize();
@@ -36,12 +38,16 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const baseTop = isCompactStack ? 90 : 140;
-  const verticalStep = isCompactStack ? 18 : 30;
-  const horizontalStep = isCompactStack ? 8 : 15;
-
-  const stickyTop = baseTop + index * verticalStep;
-  const leftOffset = index * horizontalStep;
+  // Na telefonie karta z listą przykładów bywa wyższa niż ekran pod nagłówkiem,
+  // więc stos sticky zasłoniłby jej dół. Tam karty idą zwykłą kolumną.
+  const stackStyle: React.CSSProperties = isCompactStack
+    ? { position: "relative", marginBottom: "24px" }
+    : {
+        position: "sticky",
+        top: `${140 + index * 20}px`,
+        marginLeft: `${index * 10}px`,
+        marginBottom: "100px",
+      };
 
   return (
     <article
@@ -50,10 +56,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
         isVisible ? "service-card--visible" : ""
       }`}
       style={{
-        position: "sticky",
-        top: `${stickyTop}px`,
-        marginLeft: `${leftOffset}px`,
-        marginBottom: "100px",
+        ...stackStyle,
         transformOrigin: "center top",
         backgroundImage: `url(/images/cover.jpg)`,
         backgroundSize: "cover",
@@ -74,6 +77,18 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
         <span className="service-card__tag">{service.category}</span>
         <h3>{service.title}</h3>
         <p>{service.description}</p>
+        {service.examples && (
+          <ul className="service-card__examples">
+            {service.examples.map((example) => (
+              <li key={example}>{example}</li>
+            ))}
+          </ul>
+        )}
+        {service.link && (
+          <a href={service.link.href} className="btn btn_primary service-card__link">
+            {service.link.label}
+          </a>
+        )}
       </div>
     </article>
   );

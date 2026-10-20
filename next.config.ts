@@ -3,9 +3,12 @@ import type { NextConfig } from "next";
 // 'unsafe-inline' w script-src zostaje przez bootstrap hydracji Next.js:
 // statyczny HTML niesie skrypty inline, a nonce wymaga middleware, czyli
 // renderowania dynamicznego. Reszta dyrektyw i tak odcina obce źródła.
+// `next dev` (React Refresh) needs eval; without it the page never hydrates locally.
+const devEval = process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : "";
+
 const contentSecurityPolicy = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com",
+  `script-src 'self' 'unsafe-inline'${devEval} https://www.google.com https://www.gstatic.com`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https://www.google.com https://www.gstatic.com",
   "font-src 'self' data: https://fonts.gstatic.com",

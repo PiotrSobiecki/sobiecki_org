@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { contactTopics } from "@/content/oferta";
 
 // Limity chronią przed nadużyciem formularza do wysyłki gigantycznych maili.
 const MAX_NAME = 200;
@@ -64,7 +65,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Nieprawidłowe żądanie." }, { status: 400 });
   }
 
-  const { name, email, message, token } = body as Record<
+  const { name, email, message, token, topic } = body as Record<
     string,
     unknown
   >;
@@ -100,6 +101,13 @@ export async function POST(req: NextRequest) {
       { error: "Nieprawidłowy adres e-mail." },
       { status: 400 }
     );
+  }
+
+  if (
+    typeof topic !== "string" ||
+    !(contactTopics as readonly string[]).includes(topic)
+  ) {
+    return NextResponse.json({ error: "Wybierz temat z listy." }, { status: 400 });
   }
 
   if (typeof token !== "string" || !token.trim() || token.length > 8192) {
@@ -138,7 +146,7 @@ export async function POST(req: NextRequest) {
         to: [to],
         subject: `Nowa wiadomość z formularza kontaktowego od ${name}`,
         reply_to: email,
-        text: `Imię i nazwisko: ${name}\nEmail: ${email}\n\nWiadomość:\n${message}`,
+        text: `Imię i nazwisko: ${name}\nEmail: ${email}\nTemat: ${topic}\n\nWiadomość:\n${message}`,
       }),
     });
     if (!response.ok) throw new Error("Email provider rejected request");

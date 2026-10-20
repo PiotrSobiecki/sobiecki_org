@@ -6,10 +6,28 @@ import { ProjectCard } from "@/components/ui/project-card";
 import { ServiceCard } from "@/components/ui/service-card";
 import { BinaryBackground } from "@/components/ui/binary-background";
 import { BackgroundVideo } from "@/components/ui/background-video";
-import { useRef, useState, useMemo } from "react";
+import { useRef, useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
-import useRevealOnIntersect from "@/hooks/useRevealOnIntersect";
 import { getRevealStyle } from "@/utils/reveal";
+import { RevealSection } from "@/components/ui/reveal-section";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  services,
+  products,
+  problems,
+  caseStudies,
+  processSteps,
+  reasons,
+  techStack,
+  cooperation,
+  faq,
+  contactTopics,
+} from "@/content/oferta";
 
 export default function Home() {
   const recaptchaRef = useRef<ReCAPTCHA>(null);
@@ -17,81 +35,8 @@ export default function Home() {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
-  const { ref: projectsRef, isVisible: isProjectsVisible } =
-    useRevealOnIntersect({
-      threshold: 0.08,
-      rootMargin: "-5% 0px",
-    });
-
-  const { ref: servicesRef, isVisible: isServicesVisible } =
-    useRevealOnIntersect({
-      threshold: 0.08,
-      rootMargin: "0px",
-    });
-
-  const services = [
-    {
-      title: "Aplikacje Webowe",
-      description:
-        "Tworzenie nowoczesnych aplikacji i stron internetowych dopasowanych do indywidualnych potrzeb.",
-      category: "Development",
-      accentImage: "/images/uslugi-web.jpg",
-    },
-    {
-      title: "Blockchain",
-      description:
-        "Analiza danych blockchain – przetwarzanie logów, generowanie statystyk i monitorowanie aktywności.",
-      category: "Analytics",
-      accentImage: "/images/uslugi-blockchain.jpg",
-    },
-    {
-      title: "Boty",
-      description:
-        "Budowa botów do monitorowania i powiadamiania o wybranych zdarzeniach on-chain.",
-      category: "Automation",
-      accentImage: "/images/uslugi-boty.jpg",
-    },
-  ];
-
-  const projects = [
-    {
-      name: "OddajHajs",
-      description:
-        "Platforma do zarządzania wspólnymi wydatkami. Umożliwia łatwe rozliczanie się między znajomymi, współlokatorami czy członkami grupy. Dodatkowo oferuje czat, kalendarz oraz system przypomnień, co ułatwia komunikację i organizację rozliczeń.",
-      url: "https://oddajhajs.org",
-    },
-    {
-      name: "HomeCashflow",
-      description:
-        "Aplikacja do zarządzania budżetem domowym i wspólnymi finansami. Pomaga kontrolować wydatki, planować oszczędności i śledzić prognozy finansowe. Umożliwia też sterowanie inteligentnymi wtyczkami i urządzeniami oraz monitorowanie zużycia energii i jej kosztów.",
-      url: "https://homecashflow.org",
-    },
-    {
-      name: "MindWander",
-      description:
-        "Rozszerzenie do przeglądarki pomagające odkrywać nowe tematy poza bańką informacyjną. Wykorzystuje AI do proponowania zaskakujących połączeń między zagadnieniami. Oferuje analizę treści, kreatywne wyszukiwanie, sugestie i nieinwazyjny interfejs.",
-      url: "https://mind-wander.org",
-    },
-    {
-      name: "ETHFinder",
-      description:
-        "Bezpieczny generator adresów Ethereum z niestandardowymi wzorcami. Generuje adresy z określonymi prefiksami i sufiksami całkowicie w przeglądarce - bez komunikacji z serwerem, maksymalne bezpieczeństwo. Zawiera kalkulator prawdopodobieństwa i nowoczesny interfejs.",
-      url: "https://ethfinder.org",
-    },
-  ];
-
-  const sectionHeaderStyle = useMemo(
-    () => getRevealStyle(isProjectsVisible, { offset: 35, duration: "1s" }),
-    [isProjectsVisible],
-  );
-
-  const servicesHeaderStyle = useMemo(
-    () => getRevealStyle(isServicesVisible, { offset: 35, duration: "1s" }),
-    [isServicesVisible],
-  );
-
-  const getCardStyle = (index: number) =>
-    getRevealStyle(isProjectsVisible, {
+  const getCardStyle = (isVisible: boolean, index: number) =>
+    getRevealStyle(isVisible, {
       delay: index * 70,
       offset: 55,
     });
@@ -112,6 +57,7 @@ export default function Home() {
     const form = e.currentTarget;
     const name = (form.elements.namedItem("name") as HTMLInputElement).value;
     const email = (form.elements.namedItem("email") as HTMLInputElement).value;
+    const topic = (form.elements.namedItem("topic") as HTMLSelectElement).value;
     const message = (form.elements.namedItem("message") as HTMLTextAreaElement)
       .value;
     const recaptcha = recaptchaRef.current;
@@ -127,7 +73,7 @@ export default function Home() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, message, token }),
+        body: JSON.stringify({ name, email, topic, message, token }),
       });
 
       const data = await res.json();
@@ -155,60 +101,177 @@ export default function Home() {
       <Navbar />
       <HeroSection />
 
-      {/* Sekcja Usługi */}
-      <section id="uslugi" className="services" ref={servicesRef}>
-        <div className="container">
-          <div
-            className={`section-header services__intro ${
-              isServicesVisible ? "services__intro--visible" : ""
-            }`}
-            style={servicesHeaderStyle}
-          >
-            <p className="eyebrow">usługi</p>
-            <h2>Kompleksowe rozwiązania IT dostosowane do Twoich potrzeb</h2>
-          </div>
+      <RevealSection
+        id="problemy"
+        eyebrow="problemy"
+        title="Z czym przychodzą firmy"
+      >
+        {(isVisible) => (
+          <ol className="tile-grid">
+            {problems.map((problem, index) => (
+              <li
+                key={problem}
+                className="card"
+                style={getRevealStyle(isVisible, { delay: index * 70 })}
+              >
+                <span className="index-label" aria-hidden="true">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <p>{problem}</p>
+              </li>
+            ))}
+          </ol>
+        )}
+      </RevealSection>
+
+      <RevealSection
+        id="uslugi"
+        className="services"
+        eyebrow="usługi"
+        title="Co mogę wdrożyć"
+      >
+        {(isVisible) => (
           <div className="services__stack">
             {services.map((service, index) => (
               <ServiceCard
                 key={service.title}
                 service={service}
                 index={index}
-                isVisible={isServicesVisible}
+                isVisible={isVisible}
                 delayStyle={getServiceCardDelayStyle(index)}
               />
             ))}
           </div>
-        </div>
-      </section>
+        )}
+      </RevealSection>
 
-      {/* Sekcja Przykładowe Aplikacje */}
-      <section
-        id="projekty"
-        className="projects section-with-video"
-        ref={projectsRef}
+      <RevealSection
+        id="wdrozenia"
+        className="projects"
+        eyebrow="realizacje"
+        title="Wdrożenia"
+        intro="Systemy, które działają u klientów i u mnie. Bez nazw firm, bo umowy tego wymagają."
       >
-        <BackgroundVideo
-          className="section-bg-video"
-          src="/images/kafelek.mp4"
-          poster="/images/kafelek-poster.jpg"
-        />
-        <div className="container">
-          <div className="section-header" style={sectionHeaderStyle}>
-            <p className="eyebrow">projekty</p>
-            <h2>Przykładowe Projekty</h2>
-            <p>Zobacz przykłady moich realizacji</p>
-          </div>
-          <div className="projects__grid">
-            {projects.map((project, index) => (
+        {(isVisible) => (
+          <div className="projects__grid projects__grid--cases">
+            {caseStudies.map((item, index) => (
               <ProjectCard
-                key={project.name}
-                {...project}
-                style={getCardStyle(index)}
+                key={item.title}
+                className="project-card--case"
+                name={item.title}
+                description={item.description}
+                label={item.category}
+                status={item.status}
+                facts={item.facts}
+                tech={item.tech}
+                url={item.link?.href}
+                urlLabel={item.link?.label}
+                style={getCardStyle(isVisible, index)}
               />
             ))}
           </div>
-        </div>
-      </section>
+        )}
+      </RevealSection>
+
+      <RevealSection
+        id="projekty"
+        className="projects section-with-video"
+        eyebrow="produkty"
+        title="Własne produkty"
+        background={
+          <BackgroundVideo
+            className="section-bg-video"
+            src="/images/kafelek.mp4"
+            poster="/images/kafelek-poster.jpg"
+          />
+        }
+      >
+        {(isVisible) => (
+          <div className="projects__grid">
+            {products.map((product, index) => (
+              <ProjectCard
+                key={product.name}
+                {...product}
+                style={getCardStyle(isVisible, index)}
+              />
+            ))}
+          </div>
+        )}
+      </RevealSection>
+
+      <RevealSection id="proces" eyebrow="proces" title="Jak pracuję">
+        {(isVisible) => (
+          <ol className="process">
+            {processSteps.map((step, index) => (
+              <li
+                key={step.title}
+                className="process__step"
+                style={getRevealStyle(isVisible, { delay: index * 120 })}
+              >
+                <span className="index-label" aria-hidden="true">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <h3>{step.title}</h3>
+                <p>{step.description}</p>
+              </li>
+            ))}
+          </ol>
+        )}
+      </RevealSection>
+
+      <RevealSection id="dlaczego" eyebrow="o mnie" title="Dlaczego ze mną">
+        {(isVisible) => (
+          <>
+            <ul className="tile-grid">
+              {reasons.map((reason, index) => (
+                <li
+                  key={reason}
+                  className="card"
+                  style={getRevealStyle(isVisible, { delay: index * 70 })}
+                >
+                  <p>{reason}</p>
+                </li>
+              ))}
+            </ul>
+            <ul className="tech-bar" aria-label="Technologie">
+              {techStack.map((tech) => (
+                <li key={tech}>{tech}</li>
+              ))}
+            </ul>
+          </>
+        )}
+      </RevealSection>
+
+      <RevealSection id="faq" eyebrow="faq" title="Współpraca i FAQ">
+        {(isVisible) => (
+          <div style={getRevealStyle(isVisible, { delay: 100 })}>
+            <h3 className="faq__heading">Formy współpracy</h3>
+            <ul className="tile-grid">
+              {cooperation.map((item) => (
+                <li key={item} className="card">
+                  <p>{item}</p>
+                </li>
+              ))}
+            </ul>
+            <Accordion type="single" collapsible className="faq__list">
+              {faq.map((item, index) => (
+                <AccordionItem
+                  key={item.question}
+                  value={`faq-${index}`}
+                  className="border-white/15"
+                >
+                  <AccordionTrigger className="rounded-none py-5 text-base">
+                    {item.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-base text-white/70">
+                    {item.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        )}
+      </RevealSection>
 
       {/* Sekcja Kontakt */}
       <section id="kontakt" className="section resources">
@@ -225,7 +288,7 @@ export default function Home() {
             }}
           >
             <h2>Kontakt</h2>
-            <p>Skontaktuj się ze mną, aby omówić Twoje potrzeby</p>
+            <p>Odpowiadam tego samego dnia roboczego.</p>
           </div>
 
           <div className="max-w-xl mx-auto card">
@@ -261,6 +324,30 @@ export default function Home() {
                   required
                   className="w-full px-4 py-2 bg-[#0a0a0a] border border-white/20 text-white focus:ring-2 focus:ring-white focus:border-white"
                 />
+              </div>
+              <div>
+                <label
+                  htmlFor="topic"
+                  className="block text-sm font-medium text-white/80 mb-1"
+                >
+                  Temat
+                </label>
+                <select
+                  id="topic"
+                  name="topic"
+                  required
+                  defaultValue=""
+                  className="w-full px-4 py-2 bg-[#0a0a0a] border border-white/20 text-white focus:ring-2 focus:ring-white focus:border-white"
+                >
+                  <option value="" disabled>
+                    Wybierz temat
+                  </option>
+                  {contactTopics.map((topic) => (
+                    <option key={topic} value={topic}>
+                      {topic}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label
