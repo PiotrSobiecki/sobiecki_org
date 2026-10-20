@@ -255,10 +255,7 @@ function GameWindow({ onClose }: { onClose: () => void }) {
 
 export function Minesweeper() {
   const [windowIds, setWindowIds] = useState<number[]>([]);
-  const [mounted, setMounted] = useState(false);
   const nextId = useRef(0);
-
-  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     const open = () => setWindowIds((ids) => [...ids, nextId.current++]);
@@ -273,7 +270,8 @@ export function Minesweeper() {
     setWindowIds((ids) => ids.filter((openId) => openId !== id));
   }, []);
 
-  if (!mounted) return null;
+  // Okna otwiera dopiero kliknięcie po hydracji, więc serwer nie dotyka document.
+  if (windowIds.length === 0) return null;
 
   return createPortal(
     <>
