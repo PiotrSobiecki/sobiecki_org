@@ -38,7 +38,7 @@
   "description": "",
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.5",
-    "@types/node": "^22.15.18",
+    "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@types/react-google-recaptcha": "^2.1.9",
@@ -50,7 +50,7 @@
     "typescript": "npm:@typescript/typescript6@^6.0.2"
   },
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=26.0.0"
   },
   "overrides": {
     "next": {
